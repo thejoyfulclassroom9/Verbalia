@@ -482,7 +482,7 @@
       <!-- ===== AGENTS TAB ===== -->
       <div id="tab-agents" style="display:none">
         <div class="card">
-          <div class="card-title">// Gestion des agents (1–42)</div>
+          <div class="card-title">// Gestion des agents (1–43)</div>
           <div style="margin-bottom:16px;font-family:Share Tech Mono,monospace;font-size:12px;color:var(--text-dim)">
             Cliquer sur un agent pour modifier son mot de passe ou son avatar.
           </div>
@@ -533,7 +533,7 @@
 </div>
 
 <script>
-const CONFIG = { SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwzRT8f2r7zfFI-Pwy0dfToRuJ8rnZYQ2M-5L6RoGWwa6-sLyKbpSI1cYBB8VJtSdTD/exec' };
+const CONFIG = { SCRIPT_URL: 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE' };
 
 const NATO = ['Alpha','Bravo','Charlie','Delta','Echo','Foxtrot','Golf','Hotel',
   'India','Juliet','Kilo','Lima','Mike','November','Oscar','Papa',
@@ -985,7 +985,7 @@ function renderAgentsTable() {
   const tbody = document.getElementById('agents-tbody');
   tbody.innerHTML = '';
 
-  for (let i = 1; i <= 42; i++) {
+  for (let i = 1; i <= 43; i++) {
     const agent = adminState.agents.find(a => a.id == i) || { id: i, intuition: 0, completedModules: [] };
     const completed = agent.completedModules || [];
 
@@ -1108,8 +1108,8 @@ async function resetAllScores() {
 }
 
 async function resetAgent() {
-  const id = prompt('Numéro de l\'agent à réinitialiser (1-42):');
-  if (!id || isNaN(id) || id < 1 || id > 42) { notify('Numéro invalide', 'error'); return; }
+  const id = prompt('Numéro de l\'agent à réinitialiser (1-43):');
+  if (!id || isNaN(id) || id < 1 || id > 43) { notify('Numéro invalide', 'error'); return; }
   if (!confirm(`Réinitialiser l'Agent ${id}?`)) return;
   const res = await apiPost('resetAgent', { agentId: id });
   if (res.success) {
