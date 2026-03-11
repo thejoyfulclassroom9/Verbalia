@@ -1029,7 +1029,7 @@
     <div class="login-panel">
       <div class="field-group">
         <div class="field-label">// Numéro d'agent</div>
-        <input type="number" class="login-input" id="login-agent" placeholder="00" min="0" max="42">
+        <input type="number" class="login-input" id="login-agent" placeholder="00" min="0" max="43">
       </div>
       <div class="field-group">
         <div class="field-label">// Code d'accès</div>
@@ -1141,7 +1141,7 @@
 // CONFIG — Remplace par ton URL Google Apps Script
 // ============================================================
 const CONFIG = {
-  SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwzRT8f2r7zfFI-Pwy0dfToRuJ8rnZYQ2M-5L6RoGWwa6-sLyKbpSI1cYBB8VJtSdTD/exec',
+  SCRIPT_URL: 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE',
   TIMER_SECONDS: 27
 };
 
@@ -1472,10 +1472,12 @@ function renderLeaderboard(type) {
     sorted = [...players].sort((a, b) => (b.intuition || 0) - (a.intuition || 0));
   } else {
     sorted = [...players].sort((a, b) => {
-      const aLevel = (b.completedModules || []).length;
-      const bLevel = (a.completedModules || []).length;
-      return aLevel - bLevel;
-    }).reverse();
+      const aBadges = (a.completedModules || []).length;
+      const bBadges = (b.completedModules || []).length;
+      if (bBadges !== aBadges) return bBadges - aBadges;
+      // Égalité → départager par intuition
+      return (b.intuition || 0) - (a.intuition || 0);
+    });
   }
 
   sorted.forEach((agent, i) => {
