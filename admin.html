@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verbalia — ADMIN</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #050a0f; --bg2: #0a1520; --panel: #0d1e2e;
+    --border: #1a3a5c; --accent: #00d4ff; --accent2: #0099cc;
+    --gold: #ffd700; --text: #c8e8ff; --text-dim: #4a7a9b;
+    --danger: #ff3366; --success: #00ff88;
+    --admin: #ff9500;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'Rajdhani', sans-serif; min-height: 100vh; }
+
+  .bg-grid {
+    position: fixed; inset: 0; z-index: 0;
+    background-image: linear-gradient(rgba(255,149,0,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,149,0,0.02) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .admin-layout { position: relative; z-index: 1; display: flex; min-height: 100vh; }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 260px;
+    background: var(--panel);
+    border-right: 1px solid var(--border);
+    border-right-color: rgba(255,149,0,0.3);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+
+  .sidebar-brand {
+    padding: 24px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sidebar-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 14px;
+    font-weight: 900;
+    color: var(--admin);
+    letter-spacing: 3px;
+  }
+  .sidebar-sub {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+    margin-top: 4px;
+  }
+
+  .sidebar-nav { flex: 1; padding: 16px 0; }
+  .nav-section-title {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+    padding: 8px 20px 4px;
+    text-transform: uppercase;
+  }
+
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    color: var(--text-dim);
+    border-left: 3px solid transparent;
+  }
+  .sidebar-item:hover { color: var(--text); background: rgba(255,149,0,0.05); }
+  .sidebar-item.active { color: var(--admin); border-left-color: var(--admin); background: rgba(255,149,0,0.08); }
+  .sidebar-item .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); flex-shrink: 0; }
+  .sidebar-item.active .dot, .sidebar-item.has-content .dot { background: var(--success); }
+
+  .sidebar-logout {
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* MAIN */
+  .admin-main { flex: 1; display: flex; flex-direction: column; }
+
+  .admin-topbar {
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .admin-topbar-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--admin);
+    letter-spacing: 3px;
+  }
+  .admin-status {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+
+  .admin-content { flex: 1; padding: 32px; max-width: 900px; }
+
+  /* CARDS */
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--admin);
+    padding: 28px;
+    margin-bottom: 24px;
+    clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+  }
+  .card-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 13px;
+    letter-spacing: 3px;
+    color: var(--admin);
+    margin-bottom: 20px;
+    text-transform: uppercase;
+  }
+
+  /* FORM ELEMENTS */
+  .field-group { margin-bottom: 20px; }
+  .field-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    margin-bottom: 8px;
+    display: block;
+    text-transform: uppercase;
+  }
+  .field-input, .field-select, .field-textarea {
+    width: 100%;
+    background: rgba(0,212,255,0.05);
+    border: 1px solid var(--border);
+    border-bottom: 2px solid var(--accent2);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 16px;
+    padding: 12px 16px;
+    outline: none;
+    transition: all 0.2s;
+  }
+  .field-input:focus, .field-select:focus, .field-textarea:focus {
+    border-color: var(--accent);
+    background: rgba(0,212,255,0.08);
+  }
+  .field-select option { background: var(--bg2); }
+  .field-textarea { resize: vertical; min-height: 80px; font-family: 'Rajdhani', sans-serif; }
+
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  /* BUTTONS */
+  .btn {
+    background: transparent;
+    border: 2px solid;
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    padding: 12px 24px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+  }
+  .btn-admin { border-color: var(--admin); color: var(--admin); }
+  .btn-admin:hover { background: var(--admin); color: var(--bg); }
+  .btn-danger { border-color: var(--danger); color: var(--danger); }
+  .btn-danger:hover { background: var(--danger); color: #fff; }
+  .btn-success { border-color: var(--success); color: var(--success); }
+  .btn-success:hover { background: var(--success); color: var(--bg); }
+  .btn-sm { padding: 8px 16px; font-size: 10px; }
+
+  /* QUESTIONS LIST */
+  .questions-list { margin-top: 20px; }
+  .question-item {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 16px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+  }
+  .question-num {
+    font-family: 'Orbitron', monospace;
+    font-size: 14px;
+    color: var(--admin);
+    width: 24px;
+    flex-shrink: 0;
+  }
+  .question-content { flex: 1; min-width: 0; }
+  .question-text-preview {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 15px;
+    color: var(--text);
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .question-type-badge {
+    display: inline-block;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    border: 1px solid var(--accent2);
+    padding: 2px 8px;
+    text-transform: uppercase;
+  }
+  .question-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+  /* IMAGE UPLOAD */
+  .image-upload-area {
+    border: 2px dashed var(--border);
+    padding: 32px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .image-upload-area:hover { border-color: var(--admin); background: rgba(255,149,0,0.05); }
+  .image-upload-area input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  .image-upload-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+  }
+  .image-preview { max-width: 200px; max-height: 200px; margin: 12px auto 0; display: block; border-radius: 50%; border: 3px solid var(--admin); }
+
+  /* AGENTS TABLE */
+  .agents-table { width: 100%; border-collapse: collapse; }
+  .agents-table th {
+    background: var(--bg2);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    text-transform: uppercase;
+  }
+  .agents-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(26,58,92,0.5);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 14px;
+    vertical-align: middle;
+  }
+  .agents-table tr:hover td { background: rgba(255,149,0,0.03); }
+
+  .agent-avatar-cell {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    overflow: hidden;
+    background: var(--bg2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Orbitron', monospace;
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+  .agent-avatar-cell img { width: 100%; height: 100%; object-fit: cover; }
+
+  .badge-progress {
+    display: flex;
+    gap: 3px;
+    flex-wrap: wrap;
+  }
+  .badge-pip {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--border);
+    font-size: 0;
+  }
+  .badge-pip.done { background: var(--success); }
+
+  /* TABS */
+  .admin-tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 28px; }
+  .admin-tab {
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: var(--text-dim);
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    padding: 14px 24px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+  .admin-tab.active { color: var(--admin); border-bottom-color: var(--admin); }
+
+  /* MODULE SELECTOR GRID */
+  .module-select-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+  .module-select-btn {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-family: 'Orbitron', monospace;
+    font-size: 16px;
+    font-weight: 700;
+    padding: 16px 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    position: relative;
+    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+  }
+  .module-select-btn:hover { border-color: var(--admin); color: var(--admin); }
+  .module-select-btn.selected { border-color: var(--admin); color: var(--admin); background: rgba(255,149,0,0.1); }
+  .module-select-btn.has-content::after {
+    content: '✓';
+    position: absolute;
+    top: 2px;
+    right: 4px;
+    font-size: 10px;
+    color: var(--success);
+  }
+  .module-select-btn.locked-module { opacity: 0.3; cursor: not-allowed; }
+  .module-select-btn .module-nato-sm {
+    display: block;
+    font-size: 8px;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+    font-family: 'Share Tech Mono', monospace;
+    margin-top: 2px;
+  }
+
+  /* NOTIFICATIONS */
+  .notification {
+    position: fixed; top: 20px; right: 20px; z-index: 9999;
+    background: var(--panel);
+    border: 1px solid var(--admin);
+    border-left: 4px solid var(--admin);
+    padding: 14px 20px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    color: var(--text);
+    transform: translateX(400px);
+    transition: transform 0.4s ease;
+    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+  }
+  .notification.show { transform: translateX(0); }
+  .notification.success { border-color: var(--success); }
+  .notification.error { border-color: var(--danger); }
+
+  /* MODAL */
+  .modal-overlay { position: fixed; inset: 0; z-index: 500; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; padding: 20px; }
+  .modal-overlay.open { display: flex; }
+  .modal-box { background: var(--panel); border: 1px solid var(--border); border-top: 2px solid var(--admin); padding: 32px; max-width: 600px; width: 100%; max-height: 80vh; overflow-y: auto; clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px)); }
+  .modal-title { font-family: 'Orbitron', monospace; font-size: 16px; font-weight: 700; color: var(--admin); margin-bottom: 20px; letter-spacing: 3px; }
+  .modal-close { float: right; background: transparent; border: none; color: var(--text-dim); font-size: 20px; cursor: pointer; }
+  .modal-close:hover { color: var(--danger); }
+
+  .loading-bar-container { width: 100%; height: 2px; background: var(--border); margin-top: 8px; }
+  .loading-bar { height: 100%; background: var(--admin); animation: loadBar 1.5s ease-in-out infinite; }
+  @keyframes loadBar { 0% { width: 0%; } 50% { width: 70%; } 100% { width: 100%; } }
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="notification" id="notification"></div>
+
+<div class="modal-overlay" id="modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-title" id="modal-title"></div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<div class="admin-layout">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-title">VERBALIA</div>
+      <div class="sidebar-sub">// MODE ADMIN — AGENT 0</div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-section-title">Navigation</div>
+      <div class="sidebar-item active" onclick="showAdminTab('modules')" id="sidebar-modules">
+        <div class="dot"></div>MODULES
+      </div>
+      <div class="sidebar-item" onclick="showAdminTab('agents')" id="sidebar-agents">
+        <div class="dot"></div>AGENTS
+      </div>
+      <div class="sidebar-item" onclick="showAdminTab('parametres')" id="sidebar-parametres">
+        <div class="dot"></div>PARAMÈTRES
+      </div>
+    </div>
+    <div class="sidebar-logout">
+      <button class="btn btn-danger btn-sm" style="width:100%" onclick="doLogout()">DÉCONNEXION</button>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <div class="admin-topbar-title">PANNEAU DE CONTRÔLE</div>
+      <div class="admin-status" id="admin-status">Chargement...</div>
+    </div>
+
+    <div class="admin-content">
+
+      <!-- ===== MODULES TAB ===== -->
+      <div id="tab-modules">
+        <div class="card">
+          <div class="card-title">// Sélectionner un module à créer / modifier</div>
+          <div class="module-select-grid" id="module-select-grid"></div>
+          <p style="font-family:Share Tech Mono,monospace;font-size:11px;color:var(--text-dim);letter-spacing:1px">
+            ✓ = Module créé &nbsp;|&nbsp; Les modules se débloquent dans l'ordre (A → Z)
+          </p>
+        </div>
+
+        <div class="card" id="module-editor" style="display:none">
+          <div class="card-title" id="module-editor-title">// Modifier module A — ALPHA</div>
+
+          <!-- Module image -->
+          <div class="field-group">
+            <label class="field-label">Image du badge (1700×1700, fond blanc)</label>
+            <div class="image-upload-area" id="module-img-upload">
+              <input type="file" accept="image/*" onchange="handleModuleImage(event)">
+              <div class="image-upload-label">Cliquer pour importer une image PNG</div>
+              <img class="image-preview" id="module-img-preview" style="display:none" alt="Badge">
+            </div>
+          </div>
+
+          <!-- Pass percentage -->
+          <div class="field-group" style="max-width:200px">
+            <label class="field-label">Pourcentage de réussite requis (%)</label>
+            <input type="number" class="field-input" id="module-pass-pct" min="1" max="100" value="70">
+          </div>
+
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+            <div style="font-family:Orbitron,monospace;font-size:12px;letter-spacing:2px;color:var(--text-dim)">
+              QUESTIONS (<span id="question-count">0</span>)
+            </div>
+            <button class="btn btn-admin btn-sm" onclick="openAddQuestion()">+ AJOUTER UNE QUESTION</button>
+          </div>
+
+          <div class="questions-list" id="questions-list"></div>
+
+          <div style="display:flex;gap:16px;margin-top:24px;flex-wrap:wrap">
+            <button class="btn btn-success" onclick="saveModule()">ENREGISTRER LE MODULE</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteModule()" id="btn-delete-module">SUPPRIMER CE MODULE</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== AGENTS TAB ===== -->
+      <div id="tab-agents" style="display:none">
+        <div class="card">
+          <div class="card-title">// Gestion des agents (1–42)</div>
+          <div style="margin-bottom:16px;font-family:Share Tech Mono,monospace;font-size:12px;color:var(--text-dim)">
+            Cliquer sur un agent pour modifier son mot de passe ou son avatar.
+          </div>
+          <table class="agents-table" id="agents-table">
+            <thead>
+              <tr>
+                <th>Avatar</th>
+                <th>Agent</th>
+                <th>Badges</th>
+                <th>Intuition</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="agents-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ===== PARAMÈTRES TAB ===== -->
+      <div id="tab-parametres" style="display:none">
+        <div class="card">
+          <div class="card-title">// Paramètres globaux</div>
+          <div class="field-group" style="max-width:200px">
+            <label class="field-label">Durée du minuteur (secondes)</label>
+            <input type="number" class="field-input" id="param-timer" value="27" min="5" max="120">
+          </div>
+          <div class="field-group" style="max-width:400px">
+            <label class="field-label">Nom du jeu</label>
+            <input type="text" class="field-input" id="param-gamename" value="Monde de Verbalia">
+          </div>
+          <button class="btn btn-admin" onclick="saveParams()">ENREGISTRER LES PARAMÈTRES</button>
+        </div>
+
+        <div class="card">
+          <div class="card-title">// Réinitialisation</div>
+          <p style="font-family:Rajdhani,sans-serif;font-size:16px;color:var(--text);margin-bottom:20px;line-height:1.5">
+            Ces actions sont irréversibles. Utiliser avec précaution.
+          </p>
+          <div style="display:flex;gap:16px;flex-wrap:wrap">
+            <button class="btn btn-danger" onclick="resetAllScores()">RÉINITIALISER TOUS LES SCORES</button>
+            <button class="btn btn-danger" onclick="resetAgent()">RÉINITIALISER UN AGENT</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+const CONFIG = { SCRIPT_URL: 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE' };
+
+const NATO = ['Alpha','Bravo','Charlie','Delta','Echo','Foxtrot','Golf','Hotel',
+  'India','Juliet','Kilo','Lima','Mike','November','Oscar','Papa',
+  'Quebec','Romeo','Sierra','Tango','Uniform','Victor','Whiskey','X-ray','Yankee','Zulu'];
+const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+const CHAKRA_MAP = {0:'1',1:'1',2:'1',3:'1',4:'2',5:'2',6:'2',7:'2',8:'3',9:'3',10:'3',11:'3',12:'4',13:'4',14:'4',15:'4',16:'5',17:'5',18:'5',19:'5',20:'6',21:'6',22:'6',23:'7',24:'7',25:'7'};
+const CHAKRA_COLORS = {'1':'#FF0000','2':'#FF7F00','3':'#FFD700','4':'#00C853','5':'#00BFFF','6':'#4B0082','7':'#9B59B6'};
+
+let adminState = {
+  modules: {},
+  agents: [],
+  selectedModule: null,
+  currentModuleData: { image: null, passPct: 70, questions: [] },
+  editingQuestionIndex: -1
+};
+
+// ============================================================
+// API
+// ============================================================
+async function apiCall(action, data = {}) {
+  try {
+    const params = new URLSearchParams({ action, ...data });
+    const res = await fetch(CONFIG.SCRIPT_URL + '?' + params.toString());
+    return await res.json();
+  } catch(e) { return { success: false, error: e.message }; }
+}
+async function apiPost(action, data = {}) {
+  try {
+    const res = await fetch(CONFIG.SCRIPT_URL, {
+      method: 'POST', body: JSON.stringify({ action, ...data }),
+      headers: { 'Content-Type': 'application/json' }
+    });
+    return await res.json();
+  } catch(e) { return { success: false, error: e.message }; }
+}
+
+// ============================================================
+// INIT
+// ============================================================
+window.addEventListener('load', async () => {
+  const agent = sessionStorage.getItem('verbalia_agent');
+  if (!agent || JSON.parse(agent).id != 0) {
+    window.location.href = 'index.html';
+    return;
+  }
+  await loadAdminData();
+});
+
+async function loadAdminData() {
+  document.getElementById('admin-status').innerHTML = 'Chargement... <div class="loading-bar-container"><div class="loading-bar"></div></div>';
+  const res = await apiCall('getData');
+  if (res.success) {
+    adminState.modules = res.modules || {};
+    adminState.agents = res.agents || [];
+    document.getElementById('admin-status').textContent = `${Object.keys(adminState.modules).length} modules | ${adminState.agents.filter(a=>a.id!=0).length} agents actifs`;
+    renderModuleGrid();
+    renderAgentsTable();
+  } else {
+    document.getElementById('admin-status').textContent = 'Erreur de connexion';
+    notify('Erreur de connexion au réseau', 'error');
+  }
+}
+
+// ============================================================
+// TABS
+// ============================================================
+function showAdminTab(tab) {
+  ['modules','agents','parametres'].forEach(t => {
+    document.getElementById(`tab-${t}`).style.display = t === tab ? 'block' : 'none';
+    document.getElementById(`sidebar-${t}`).classList.toggle('active', t === tab);
+  });
+}
+
+// ============================================================
+// MODULE GRID
+// ============================================================
+function renderModuleGrid() {
+  const grid = document.getElementById('module-select-grid');
+  grid.innerHTML = '';
+  LETTERS.forEach((letter, i) => {
+    const hasContent = adminState.modules[letter] && adminState.modules[letter].questions?.length > 0;
+    const prevDone = i === 0 || (adminState.modules[LETTERS[i-1]] && adminState.modules[LETTERS[i-1]].questions?.length > 0);
+    const color = CHAKRA_COLORS[CHAKRA_MAP[i]];
+
+    const btn = document.createElement('button');
+    btn.className = 'module-select-btn' + (hasContent ? ' has-content' : '') + (!prevDone && !hasContent ? ' locked-module' : '');
+    if (adminState.selectedModule === letter) btn.classList.add('selected');
+    btn.style.borderColor = hasContent ? color : '';
+    btn.style.color = hasContent ? color : '';
+    btn.innerHTML = `${letter}<span class="module-nato-sm">${NATO[i]}</span>`;
+
+    if (prevDone || hasContent) {
+      btn.addEventListener('click', () => selectModule(letter));
+    }
+    grid.appendChild(btn);
+  });
+}
+
+function selectModule(letter) {
+  adminState.selectedModule = letter;
+  const idx = LETTERS.indexOf(letter);
+  const color = CHAKRA_COLORS[CHAKRA_MAP[idx]];
+
+  // Load existing or create new
+  if (adminState.modules[letter]) {
+    adminState.currentModuleData = JSON.parse(JSON.stringify(adminState.modules[letter]));
+  } else {
+    adminState.currentModuleData = { image: null, passPct: 70, questions: [] };
+  }
+
+  const editor = document.getElementById('module-editor');
+  editor.style.display = 'block';
+  editor.style.borderTopColor = color;
+  document.getElementById('module-editor-title').textContent = `// Module ${letter} — ${NATO[idx]}`;
+  document.getElementById('module-editor-title').style.color = color;
+  document.getElementById('module-pass-pct').value = adminState.currentModuleData.passPct || 70;
+
+  // Image preview
+  const preview = document.getElementById('module-img-preview');
+  if (adminState.currentModuleData.image) {
+    preview.src = adminState.currentModuleData.image;
+    preview.style.display = 'block';
+    preview.style.borderColor = color;
+    document.querySelector('.image-upload-label').textContent = 'Cliquer pour changer l\'image';
+  } else {
+    preview.style.display = 'none';
+    document.querySelector('.image-upload-label').textContent = 'Cliquer pour importer une image PNG';
+  }
+
+  renderQuestionsList();
+  renderModuleGrid();
+
+  // Scroll to editor
+  editor.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function handleModuleImage(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    adminState.currentModuleData.image = e.target.result;
+    const preview = document.getElementById('module-img-preview');
+    preview.src = e.target.result;
+    preview.style.display = 'block';
+    const idx = LETTERS.indexOf(adminState.selectedModule);
+    preview.style.borderColor = CHAKRA_COLORS[CHAKRA_MAP[idx]];
+    document.querySelector('.image-upload-label').textContent = 'Cliquer pour changer l\'image';
+  };
+  reader.readAsDataURL(file);
+}
+
+// ============================================================
+// QUESTIONS
+// ============================================================
+function renderQuestionsList() {
+  const list = document.getElementById('questions-list');
+  const questions = adminState.currentModuleData.questions || [];
+  document.getElementById('question-count').textContent = questions.length;
+  list.innerHTML = '';
+
+  if (questions.length === 0) {
+    list.innerHTML = '<div style="color:var(--text-dim);font-family:Share Tech Mono,monospace;font-size:12px;padding:20px;text-align:center;border:1px dashed var(--border)">Aucune question — Cliquer "+ AJOUTER" pour commencer</div>';
+    return;
+  }
+
+  questions.forEach((q, i) => {
+    const item = document.createElement('div');
+    item.className = 'question-item';
+    item.innerHTML = `
+      <div class="question-num">${i+1}</div>
+      <div class="question-content">
+        <div class="question-text-preview">${q.question}</div>
+        <span class="question-type-badge">${getTypeLabel(q.type)}</span>
+        ${q.image ? '<span style="color:var(--success);font-size:11px;margin-left:8px;font-family:Share Tech Mono,monospace"> 🖼 image</span>' : ''}
+      </div>
+      <div class="question-actions">
+        <button class="btn btn-admin btn-sm" onclick="editQuestion(${i})">MODIFIER</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteQuestion(${i})">✕</button>
+      </div>
+    `;
+    list.appendChild(item);
+  });
+}
+
+function getTypeLabel(type) {
+  const labels = { mcq: 'CHOIX MULTIPLE', tf: 'VRAI/FAUX', short: 'RÉPONSE COURTE', match: 'ASSOCIATION', number: 'NOMBRE' };
+  return labels[type] || type.toUpperCase();
+}
+
+function openAddQuestion() {
+  adminState.editingQuestionIndex = -1;
+  openQuestionModal(null);
+}
+function editQuestion(i) {
+  adminState.editingQuestionIndex = i;
+  openQuestionModal(adminState.currentModuleData.questions[i]);
+}
+function deleteQuestion(i) {
+  adminState.currentModuleData.questions.splice(i, 1);
+  renderQuestionsList();
+  notify('Question supprimée');
+}
+
+function openQuestionModal(q) {
+  document.getElementById('modal-title').textContent = q ? 'MODIFIER LA QUESTION' : 'AJOUTER UNE QUESTION';
+  document.getElementById('modal-body').innerHTML = buildQuestionForm(q);
+  document.getElementById('modal').classList.add('open');
+  updateQuestionTypeUI();
+}
+
+function buildQuestionForm(q) {
+  const type = q?.type || 'mcq';
+  const choices = q?.choices || ['','','',''];
+  const pairs = q?.pairs || [{left:'',right:''},{left:'',right:''}];
+
+  return `
+    <div class="field-group">
+      <label class="field-label">Type de question</label>
+      <select class="field-select" id="qf-type" onchange="updateQuestionTypeUI()">
+        <option value="mcq" ${type==='mcq'?'selected':''}>Choix multiples (4 options)</option>
+        <option value="tf" ${type==='tf'?'selected':''}>Vrai ou Faux</option>
+        <option value="short" ${type==='short'?'selected':''}>Réponse courte à taper</option>
+        <option value="match" ${type==='match'?'selected':''}>Associer (relier des paires)</option>
+        <option value="number" ${type==='number'?'selected':''}>Inscrire un nombre (1 chiffre)</option>
+      </select>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Texte de la question</label>
+      <textarea class="field-textarea" id="qf-question" placeholder="Écris ta question ici...">${q?.question||''}</textarea>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Image (optionnel — différents formats)</label>
+      <div class="image-upload-area" style="padding:16px">
+        <input type="file" accept="image/*" onchange="handleQuestionImage(event)" id="qf-img-input">
+        <div class="image-upload-label" id="qf-img-label">${q?.image ? '✓ Image chargée (cliquer pour changer)' : 'Cliquer pour importer une image (16:9, 9:16, carré...)'}</div>
+        ${q?.image ? `<img src="${q.image}" style="max-width:200px;max-height:150px;margin-top:8px;object-fit:contain;border:1px solid var(--border)">` : ''}
+      </div>
+    </div>
+
+    <!-- MCQ -->
+    <div id="qf-mcq-area">
+      <div class="field-group">
+        <label class="field-label">Les 4 choix de réponse</label>
+        ${[0,1,2,3].map(i => `
+          <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center">
+            <span style="font-family:Orbitron,monospace;font-size:12px;color:var(--text-dim);width:20px">${['A','B','C','D'][i]}</span>
+            <input type="text" class="field-input" id="qf-choice-${i}" value="${choices[i]||''}" placeholder="Choix ${i+1}" style="margin:0">
+          </div>
+        `).join('')}
+      </div>
+      <div class="field-group">
+        <label class="field-label">Bonne réponse</label>
+        <select class="field-select" id="qf-mcq-answer">
+          ${[0,1,2,3].map(i=>`<option value="${i}" ${q?.answer===choices[i]?'selected':''}>${['A','B','C','D'][i]}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+
+    <!-- TF -->
+    <div id="qf-tf-area" style="display:none">
+      <div class="field-group">
+        <label class="field-label">Bonne réponse</label>
+        <select class="field-select" id="qf-tf-answer">
+          <option value="Vrai" ${q?.answer==='Vrai'?'selected':''}>Vrai</option>
+          <option value="Faux" ${q?.answer==='Faux'?'selected':''}>Faux</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- SHORT / NUMBER -->
+    <div id="qf-short-area" style="display:none">
+      <div class="field-group">
+        <label class="field-label">Réponse correcte</label>
+        <input type="text" class="field-input" id="qf-short-answer" value="${q?.type==='short'||q?.type==='number' ? q.answer : ''}">
+      </div>
+    </div>
+
+    <!-- MATCH -->
+    <div id="qf-match-area" style="display:none">
+      <div class="field-group">
+        <label class="field-label">Paires à associer (gauche → droite)</label>
+        <div id="qf-pairs-list">
+          ${pairs.map((p,i) => `
+            <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-bottom:8px;align-items:center" id="pair-row-${i}">
+              <input type="text" class="field-input" id="pair-left-${i}" value="${p.left}" placeholder="Gauche ${i+1}" style="margin:0">
+              <input type="text" class="field-input" id="pair-right-${i}" value="${p.right}" placeholder="Droite ${i+1}" style="margin:0">
+              <button class="btn btn-danger btn-sm" onclick="removePairRow(${i})" style="padding:8px">✕</button>
+            </div>
+          `).join('')}
+        </div>
+        <button class="btn btn-admin btn-sm" onclick="addPairRow()" style="margin-top:8px">+ AJOUTER UNE PAIRE</button>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:12px;margin-top:24px">
+      <button class="btn btn-success" onclick="saveQuestion()">ENREGISTRER</button>
+      <button class="btn btn-danger btn-sm" onclick="closeModal()">ANNULER</button>
+    </div>
+  `;
+}
+
+let tempQuestionImage = null;
+function handleQuestionImage(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    tempQuestionImage = e.target.result;
+    document.getElementById('qf-img-label').textContent = '✓ Image chargée';
+  };
+  reader.readAsDataURL(file);
+}
+
+let pairCount = 2;
+function addPairRow() {
+  const list = document.getElementById('qf-pairs-list');
+  const i = pairCount++;
+  const row = document.createElement('div');
+  row.id = `pair-row-${i}`;
+  row.style.cssText = 'display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-bottom:8px;align-items:center';
+  row.innerHTML = `
+    <input type="text" class="field-input" id="pair-left-${i}" placeholder="Gauche" style="margin:0">
+    <input type="text" class="field-input" id="pair-right-${i}" placeholder="Droite" style="margin:0">
+    <button class="btn btn-danger btn-sm" onclick="removePairRow(${i})" style="padding:8px">✕</button>
+  `;
+  list.appendChild(row);
+}
+function removePairRow(i) {
+  document.getElementById(`pair-row-${i}`)?.remove();
+}
+
+function updateQuestionTypeUI() {
+  const type = document.getElementById('qf-type')?.value;
+  if (!type) return;
+  document.getElementById('qf-mcq-area').style.display = type === 'mcq' ? 'block' : 'none';
+  document.getElementById('qf-tf-area').style.display = type === 'tf' ? 'block' : 'none';
+  document.getElementById('qf-short-area').style.display = (type === 'short' || type === 'number') ? 'block' : 'none';
+  document.getElementById('qf-match-area').style.display = type === 'match' ? 'block' : 'none';
+}
+
+function saveQuestion() {
+  const type = document.getElementById('qf-type').value;
+  const questionText = document.getElementById('qf-question').value.trim();
+  if (!questionText) { notify('La question ne peut pas être vide', 'error'); return; }
+
+  const q = { type, question: questionText };
+
+  // Handle image
+  if (tempQuestionImage) q.image = tempQuestionImage;
+  else if (adminState.editingQuestionIndex >= 0) {
+    q.image = adminState.currentModuleData.questions[adminState.editingQuestionIndex]?.image || null;
+  }
+
+  if (type === 'mcq') {
+    const choices = [0,1,2,3].map(i => document.getElementById(`qf-choice-${i}`).value.trim()).filter(c => c);
+    if (choices.length < 2) { notify('Au moins 2 choix requis', 'error'); return; }
+    const answerIdx = parseInt(document.getElementById('qf-mcq-answer').value);
+    q.choices = choices;
+    q.answer = choices[answerIdx] || choices[0];
+  } else if (type === 'tf') {
+    q.answer = document.getElementById('qf-tf-answer').value;
+  } else if (type === 'short' || type === 'number') {
+    q.answer = document.getElementById('qf-short-answer').value.trim();
+    if (!q.answer) { notify('La réponse ne peut pas être vide', 'error'); return; }
+  } else if (type === 'match') {
+    const pairs = [];
+    document.querySelectorAll('[id^="pair-row-"]').forEach(row => {
+      const id = row.id.replace('pair-row-', '');
+      const left = document.getElementById(`pair-left-${id}`)?.value.trim();
+      const right = document.getElementById(`pair-right-${id}`)?.value.trim();
+      if (left && right) pairs.push({ left, right });
+    });
+    if (pairs.length < 2) { notify('Au moins 2 paires requises', 'error'); return; }
+    q.pairs = pairs;
+    q.answer = 'Correspondances correctes';
+  }
+
+  if (adminState.editingQuestionIndex >= 0) {
+    adminState.currentModuleData.questions[adminState.editingQuestionIndex] = q;
+  } else {
+    adminState.currentModuleData.questions.push(q);
+  }
+
+  tempQuestionImage = null;
+  closeModal();
+  renderQuestionsList();
+  notify('Question enregistrée ✓', 'success');
+}
+
+// ============================================================
+// SAVE MODULE
+// ============================================================
+async function saveModule() {
+  const letter = adminState.selectedModule;
+  if (!letter) return;
+
+  adminState.currentModuleData.passPct = parseInt(document.getElementById('module-pass-pct').value) || 70;
+
+  if (!adminState.currentModuleData.image) {
+    notify('Ajoute une image de badge avant d\'enregistrer', 'error');
+    return;
+  }
+  if (adminState.currentModuleData.questions.length === 0) {
+    notify('Ajoute au moins une question', 'error');
+    return;
+  }
+
+  document.getElementById('admin-status').innerHTML = 'Enregistrement... <div class="loading-bar-container"><div class="loading-bar"></div></div>';
+
+  const res = await apiPost('saveModule', {
+    module: letter,
+    data: JSON.stringify(adminState.currentModuleData)
+  });
+
+  if (res.success) {
+    adminState.modules[letter] = JSON.parse(JSON.stringify(adminState.currentModuleData));
+    renderModuleGrid();
+    document.getElementById('admin-status').textContent = `${Object.keys(adminState.modules).length} modules | ${adminState.agents.filter(a=>a.id!=0).length} agents actifs`;
+    notify(`Module ${letter} enregistré ✓`, 'success');
+  } else {
+    notify('Erreur lors de la sauvegarde', 'error');
+    document.getElementById('admin-status').textContent = 'Erreur de sauvegarde';
+  }
+}
+
+async function deleteModule() {
+  const letter = adminState.selectedModule;
+  if (!confirm(`Supprimer le module ${letter}? Cette action est irréversible.`)) return;
+
+  const res = await apiPost('deleteModule', { module: letter });
+  if (res.success) {
+    delete adminState.modules[letter];
+    adminState.selectedModule = null;
+    document.getElementById('module-editor').style.display = 'none';
+    renderModuleGrid();
+    notify(`Module ${letter} supprimé`, 'success');
+  } else {
+    notify('Erreur lors de la suppression', 'error');
+  }
+}
+
+// ============================================================
+// AGENTS TABLE
+// ============================================================
+function renderAgentsTable() {
+  const tbody = document.getElementById('agents-tbody');
+  tbody.innerHTML = '';
+
+  for (let i = 1; i <= 42; i++) {
+    const agent = adminState.agents.find(a => a.id == i) || { id: i, intuition: 0, completedModules: [] };
+    const completed = agent.completedModules || [];
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>
+        <div class="agent-avatar-cell">
+          ${agent.avatar ? `<img src="${agent.avatar}" alt="A${i}">` : i}
+        </div>
+      </td>
+      <td style="font-family:Orbitron,monospace;font-size:14px">AGENT ${i}</td>
+      <td>
+        <div class="badge-progress">
+          ${LETTERS.slice(0,6).map(l => `<div class="badge-pip ${completed.includes(l)?'done':''}" title="${l}"></div>`).join('')}
+          <span style="font-family:Share Tech Mono,monospace;font-size:10px;color:var(--text-dim);margin-left:4px">${completed.length}/26</span>
+        </div>
+      </td>
+      <td style="font-family:Orbitron,monospace;color:var(--gold)">${agent.intuition || 0}</td>
+      <td>
+        <button class="btn btn-admin btn-sm" onclick="openAgentEditor(${i})">MODIFIER</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  }
+}
+
+function openAgentEditor(agentId) {
+  const agent = adminState.agents.find(a => a.id == agentId) || { id: agentId };
+  document.getElementById('modal-title').textContent = `MODIFIER AGENT ${agentId}`;
+  document.getElementById('modal-body').innerHTML = `
+    <div class="field-group">
+      <label class="field-label">Nouveau mot de passe (Maj-chiffre-min-chiffre-symbole)</label>
+      <input type="text" class="field-input" id="agent-new-pw" placeholder="ex: A1b2!" maxlength="5">
+      <div style="font-family:Share Tech Mono,monospace;font-size:10px;color:var(--text-dim);margin-top:6px;letter-spacing:1px">
+        Format : 1 Majuscule + 1 chiffre + 1 minuscule + 1 chiffre + 1 symbole
+      </div>
+    </div>
+    <div class="field-group">
+      <label class="field-label">Avatar (PNG 1700×1700, fond blanc)</label>
+      <div class="image-upload-area" style="padding:16px">
+        <input type="file" accept="image/*" onchange="handleAgentAvatar(event, ${agentId})">
+        <div class="image-upload-label">${agent.avatar ? '✓ Avatar existant (cliquer pour changer)' : 'Cliquer pour importer un avatar'}</div>
+        ${agent.avatar ? `<img src="${agent.avatar}" style="width:80px;height:80px;border-radius:50%;margin-top:8px;border:2px solid var(--admin);object-fit:cover">` : ''}
+      </div>
+    </div>
+    <div style="display:flex;gap:12px;margin-top:20px">
+      <button class="btn btn-success" onclick="saveAgent(${agentId})">ENREGISTRER</button>
+      <button class="btn btn-danger btn-sm" onclick="closeModal()">ANNULER</button>
+    </div>
+  `;
+  document.getElementById('modal').classList.add('open');
+  tempAgentAvatar = null;
+}
+
+let tempAgentAvatar = null;
+function handleAgentAvatar(event, agentId) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => { tempAgentAvatar = e.target.result; };
+  reader.readAsDataURL(file);
+}
+
+async function saveAgent(agentId) {
+  const newPw = document.getElementById('agent-new-pw').value.trim();
+  const updates = {};
+  if (newPw) {
+    if (!validatePassword(newPw)) {
+      notify('Format du mot de passe invalide (Maj-chiffre-min-chiffre-symbole)', 'error');
+      return;
+    }
+    updates.password = newPw;
+  }
+  if (tempAgentAvatar) updates.avatar = tempAgentAvatar;
+
+  if (Object.keys(updates).length === 0) { notify('Aucune modification', 'error'); return; }
+
+  const res = await apiPost('updateAgent', { agentId, updates: JSON.stringify(updates) });
+  if (res.success) {
+    // Update local
+    let agent = adminState.agents.find(a => a.id == agentId);
+    if (!agent) { agent = { id: agentId }; adminState.agents.push(agent); }
+    Object.assign(agent, updates);
+    closeModal();
+    renderAgentsTable();
+    notify(`Agent ${agentId} mis à jour ✓`, 'success');
+    tempAgentAvatar = null;
+  } else {
+    notify('Erreur lors de la mise à jour', 'error');
+  }
+}
+
+function validatePassword(pw) {
+  return /^[A-Z]/.test(pw[0]) &&
+         /\d/.test(pw[1]) &&
+         /[a-z]/.test(pw[2]) &&
+         /\d/.test(pw[3]) &&
+         /[^a-zA-Z0-9]/.test(pw[4]);
+}
+
+// ============================================================
+// PARAMS & RESET
+// ============================================================
+async function saveParams() {
+  const timer = document.getElementById('param-timer').value;
+  const gameName = document.getElementById('param-gamename').value;
+  const res = await apiPost('saveParams', { timer, gameName });
+  if (res.success) notify('Paramètres enregistrés ✓', 'success');
+  else notify('Erreur', 'error');
+}
+
+async function resetAllScores() {
+  if (!confirm('Réinitialiser TOUS les scores de tous les agents? Irréversible.')) return;
+  const res = await apiPost('resetAllScores');
+  if (res.success) {
+    adminState.agents.forEach(a => { a.intuition = 0; a.completedModules = []; });
+    renderAgentsTable();
+    notify('Tous les scores réinitialisés', 'success');
+  } else notify('Erreur', 'error');
+}
+
+async function resetAgent() {
+  const id = prompt('Numéro de l\'agent à réinitialiser (1-42):');
+  if (!id || isNaN(id) || id < 1 || id > 42) { notify('Numéro invalide', 'error'); return; }
+  if (!confirm(`Réinitialiser l'Agent ${id}?`)) return;
+  const res = await apiPost('resetAgent', { agentId: id });
+  if (res.success) {
+    const agent = adminState.agents.find(a => a.id == id);
+    if (agent) { agent.intuition = 0; agent.completedModules = []; }
+    renderAgentsTable();
+    notify(`Agent ${id} réinitialisé`, 'success');
+  } else notify('Erreur', 'error');
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function closeModal() { document.getElementById('modal').classList.remove('open'); tempQuestionImage = null; }
+function doLogout() { sessionStorage.removeItem('verbalia_agent'); window.location.href = 'index.html'; }
+function notify(msg, type = '') {
+  const el = document.getElementById('notification');
+  el.textContent = msg;
+  el.className = 'notification ' + type + ' show';
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// Close modal on overlay click
+document.getElementById('modal').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('modal')) closeModal();
+});
+</script>
+</body>
+</html>

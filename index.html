@@ -1,0 +1,2017 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monde de Verbalia</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #050a0f;
+    --bg2: #0a1520;
+    --panel: #0d1e2e;
+    --border: #1a3a5c;
+    --accent: #00d4ff;
+    --accent2: #0099cc;
+    --gold: #ffd700;
+    --text: #c8e8ff;
+    --text-dim: #4a7a9b;
+    --danger: #ff3366;
+    --success: #00ff88;
+    --glow: 0 0 20px rgba(0,212,255,0.4);
+    --glow-gold: 0 0 20px rgba(255,215,0,0.4);
+
+    --chakra-1: #FF0000;
+    --chakra-2: #FF7F00;
+    --chakra-3: #FFD700;
+    --chakra-4: #00C853;
+    --chakra-5: #00BFFF;
+    --chakra-6: #4B0082;
+    --chakra-7: #9B59B6;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ANIMATED BACKGROUND */
+  .bg-grid {
+    position: fixed; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    animation: gridShift 20s linear infinite;
+  }
+  @keyframes gridShift { from { background-position: 0 0; } to { background-position: 40px 40px; } }
+
+  .bg-scan {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background: linear-gradient(transparent 50%, rgba(0,212,255,0.015) 50%);
+    background-size: 100% 4px;
+    animation: scan 8s linear infinite;
+  }
+  @keyframes scan { from { background-position: 0 0; } to { background-position: 0 100vh; } }
+
+  /* SCREENS */
+  .screen { position: relative; z-index: 1; display: none; min-height: 100vh; }
+  .screen.active { display: flex; flex-direction: column; }
+
+  /* ===== LOGIN SCREEN ===== */
+  #screen-login {
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .login-container {
+    width: 100%;
+    max-width: 460px;
+    text-align: center;
+  }
+
+  .logo-area {
+    margin-bottom: 48px;
+  }
+
+  .logo-title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(28px, 5vw, 42px);
+    font-weight: 900;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    background: linear-gradient(135deg, #00d4ff, #ffffff, #00d4ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: none;
+    filter: drop-shadow(0 0 20px rgba(0,212,255,0.6));
+    animation: titlePulse 3s ease-in-out infinite;
+  }
+  @keyframes titlePulse {
+    0%, 100% { filter: drop-shadow(0 0 20px rgba(0,212,255,0.6)); }
+    50% { filter: drop-shadow(0 0 40px rgba(0,212,255,0.9)); }
+  }
+
+  .logo-sub {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 6px;
+    color: var(--text-dim);
+    margin-top: 8px;
+    text-transform: uppercase;
+  }
+
+  .login-panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--accent);
+    padding: 40px;
+    position: relative;
+    clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+  }
+
+  .login-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(0,212,255,0.05) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .field-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-align: left;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+
+  .field-group { margin-bottom: 24px; }
+
+  .login-input {
+    width: 100%;
+    background: rgba(0,212,255,0.05);
+    border: 1px solid var(--border);
+    border-bottom: 2px solid var(--accent2);
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 18px;
+    padding: 14px 16px;
+    outline: none;
+    transition: all 0.3s;
+    letter-spacing: 2px;
+  }
+  .login-input:focus {
+    border-color: var(--accent);
+    background: rgba(0,212,255,0.1);
+    box-shadow: var(--glow);
+  }
+
+  .btn-primary {
+    width: 100%;
+    background: transparent;
+    border: 2px solid var(--accent);
+    color: var(--accent);
+    font-family: 'Orbitron', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    padding: 16px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+  }
+  .btn-primary::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--accent);
+    transform: translateX(-100%);
+    transition: transform 0.3s;
+    z-index: -1;
+  }
+  .btn-primary:hover { color: var(--bg); box-shadow: var(--glow); }
+  .btn-primary:hover::before { transform: translateX(0); }
+
+  .login-error {
+    color: var(--danger);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    margin-top: 12px;
+    display: none;
+    animation: shake 0.3s ease;
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-8px); }
+    75% { transform: translateX(8px); }
+  }
+
+  /* ===== MAIN GAME SCREEN ===== */
+  #screen-game { padding: 0; }
+
+  .game-header {
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-brand {
+    font-family: 'Orbitron', monospace;
+    font-size: 16px;
+    font-weight: 900;
+    letter-spacing: 3px;
+    color: var(--accent);
+  }
+
+  .header-agent {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+
+  .header-intuition {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .intuition-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+  }
+  .intuition-value {
+    font-family: 'Orbitron', monospace;
+    font-size: 20px;
+    color: var(--gold);
+    font-weight: 700;
+    text-shadow: var(--glow-gold);
+  }
+
+  .btn-logout {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-logout:hover { border-color: var(--danger); color: var(--danger); }
+
+  .game-nav {
+    display: flex;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-btn {
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: var(--text-dim);
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    padding: 16px 28px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+  .nav-btn.active, .nav-btn:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  .game-content { flex: 1; padding: 32px; }
+
+  /* ===== MODULES GRID ===== */
+  .section-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 13px;
+    letter-spacing: 4px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .chakra-group { margin-bottom: 40px; }
+  .chakra-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    padding: 6px 16px;
+    display: inline-block;
+    border-left: 3px solid;
+  }
+
+  .modules-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .module-card {
+    width: 120px;
+    height: 140px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+    overflow: hidden;
+  }
+
+  .module-card.locked {
+    opacity: 0.35;
+    cursor: not-allowed;
+    filter: grayscale(1);
+  }
+
+  .module-card.completed {
+    border-color: rgba(0,255,136,0.4);
+  }
+  .module-card.completed::after {
+    content: '✓';
+    position: absolute;
+    top: 6px;
+    right: 10px;
+    color: var(--success);
+    font-size: 12px;
+    font-weight: bold;
+  }
+
+  .module-card:not(.locked):hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 32px rgba(0,212,255,0.2);
+    border-color: var(--accent);
+  }
+
+  .module-letter {
+    font-family: 'Orbitron', monospace;
+    font-size: 36px;
+    font-weight: 900;
+    line-height: 1;
+  }
+
+  .module-nato {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+
+  .module-badge-img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 2px solid;
+    object-fit: cover;
+    background: var(--bg2);
+  }
+
+  .module-card.no-content {
+    opacity: 0.2;
+    cursor: not-allowed;
+  }
+
+  /* ===== CLASSEMENT ===== */
+  .leaderboard-tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .lb-tab {
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: var(--text-dim);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 2px;
+    padding: 12px 24px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+  .lb-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+  .lb-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 20px;
+    border: 1px solid var(--border);
+    margin-bottom: 8px;
+    background: var(--panel);
+    transition: all 0.2s;
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+  }
+  .lb-row:hover { border-color: var(--accent2); }
+  .lb-row.me { border-color: var(--gold); background: rgba(255,215,0,0.05); }
+
+  .lb-rank {
+    font-family: 'Orbitron', monospace;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-dim);
+    width: 32px;
+    text-align: center;
+  }
+  .lb-rank.top1 { color: var(--gold); text-shadow: var(--glow-gold); }
+  .lb-rank.top2 { color: #c0c0c0; }
+  .lb-rank.top3 { color: #cd7f32; }
+
+  .lb-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background: var(--bg2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Orbitron', monospace;
+    font-size: 12px;
+    color: var(--text-dim);
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .lb-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+  .lb-agent {
+    flex: 1;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 14px;
+    color: var(--text);
+  }
+
+  .lb-score {
+    font-family: 'Orbitron', monospace;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--gold);
+  }
+
+  .lb-badge-level {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    text-align: right;
+  }
+
+  /* ===== QUIZ SCREEN ===== */
+  #screen-quiz {
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0;
+  }
+
+  .quiz-header {
+    width: 100%;
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .quiz-module-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .quiz-letter {
+    font-family: 'Orbitron', monospace;
+    font-size: 48px;
+    font-weight: 900;
+    line-height: 1;
+  }
+
+  .quiz-meta { display: flex; flex-direction: column; gap: 4px; }
+  .quiz-nato {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+  .quiz-progress-text {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 14px;
+    color: var(--text);
+  }
+
+  .timer-ring {
+    position: relative;
+    width: 70px;
+    height: 70px;
+  }
+  .timer-ring svg { transform: rotate(-90deg); }
+  .timer-ring-bg { fill: none; stroke: var(--border); stroke-width: 4; }
+  .timer-ring-fg { fill: none; stroke: var(--accent); stroke-width: 4; stroke-linecap: round; transition: stroke-dashoffset 1s linear, stroke 0.3s; }
+  .timer-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Orbitron', monospace;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .quiz-progress-bar {
+    width: 100%;
+    height: 3px;
+    background: var(--border);
+  }
+  .quiz-progress-fill {
+    height: 100%;
+    background: var(--accent);
+    transition: width 0.5s ease;
+  }
+
+  .quiz-body {
+    flex: 1;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 32px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .question-text {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(20px, 3vw, 28px);
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 12px;
+    line-height: 1.4;
+  }
+
+  .question-image {
+    max-width: 100%;
+    max-height: 300px;
+    object-fit: contain;
+    margin-bottom: 24px;
+    border: 1px solid var(--border);
+  }
+
+  /* MULTIPLE CHOICE */
+  .choices-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 24px;
+  }
+
+  .choice-btn {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    padding: 18px 20px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s;
+    position: relative;
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+  }
+  .choice-btn:hover:not(:disabled) {
+    border-color: var(--accent);
+    background: rgba(0,212,255,0.1);
+  }
+  .choice-btn.correct { border-color: var(--success); background: rgba(0,255,136,0.1); color: var(--success); }
+  .choice-btn.wrong { border-color: var(--danger); background: rgba(255,51,102,0.1); color: var(--danger); }
+  .choice-btn:disabled { cursor: default; }
+
+  .choice-letter {
+    font-family: 'Orbitron', monospace;
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-right: 12px;
+  }
+
+  /* TRUE/FALSE */
+  .tf-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 24px;
+  }
+  .tf-btn {
+    background: var(--panel);
+    border: 2px solid var(--border);
+    color: var(--text);
+    font-family: 'Orbitron', monospace;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    padding: 32px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+  }
+  .tf-btn:hover:not(:disabled) {
+    border-color: var(--accent);
+    background: rgba(0,212,255,0.1);
+  }
+  .tf-btn.correct { border-color: var(--success); background: rgba(0,255,136,0.1); color: var(--success); }
+  .tf-btn.wrong { border-color: var(--danger); background: rgba(255,51,102,0.1); color: var(--danger); }
+
+  /* SHORT ANSWER */
+  .short-answer-area { margin-top: 24px; }
+  .short-input {
+    width: 100%;
+    background: rgba(0,212,255,0.05);
+    border: 1px solid var(--border);
+    border-bottom: 2px solid var(--accent2);
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 22px;
+    padding: 16px 20px;
+    outline: none;
+    transition: all 0.3s;
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+  }
+  .short-input:focus {
+    border-color: var(--accent);
+    background: rgba(0,212,255,0.1);
+    box-shadow: var(--glow);
+  }
+
+  .btn-submit {
+    background: transparent;
+    border: 2px solid var(--accent);
+    color: var(--accent);
+    font-family: 'Orbitron', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    padding: 14px 32px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+  }
+  .btn-submit:hover { background: var(--accent); color: var(--bg); }
+
+  /* MATCHING */
+  .matching-area { margin-top: 24px; }
+  .matching-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .matching-col-title {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+  }
+  .match-item {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+  }
+  .match-item:hover { border-color: var(--accent); background: rgba(0,212,255,0.08); }
+  .match-item.selected { border-color: var(--accent); background: rgba(0,212,255,0.15); color: var(--accent); }
+  .match-item.matched-correct { border-color: var(--success); background: rgba(0,255,136,0.08); color: var(--success); cursor: default; }
+  .match-item.matched-wrong { border-color: var(--danger); background: rgba(255,51,102,0.08); cursor: default; animation: shake 0.3s ease; }
+
+  /* FEEDBACK */
+  .feedback-bar {
+    padding: 16px 24px;
+    margin-top: 20px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    display: none;
+    align-items: center;
+    gap: 12px;
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+  }
+  .feedback-bar.correct { display: flex; background: rgba(0,255,136,0.1); border: 1px solid var(--success); color: var(--success); }
+  .feedback-bar.wrong { display: flex; background: rgba(255,51,102,0.1); border: 1px solid var(--danger); color: var(--danger); }
+
+  /* ===== RESULTS SCREEN ===== */
+  #screen-results {
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+
+  .results-container {
+    width: 100%;
+    max-width: 600px;
+    text-align: center;
+  }
+
+  .results-title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(20px, 4vw, 32px);
+    font-weight: 900;
+    margin-bottom: 8px;
+  }
+  .results-title.success { color: var(--success); text-shadow: 0 0 30px rgba(0,255,136,0.5); }
+  .results-title.failure { color: var(--danger); text-shadow: 0 0 30px rgba(255,51,102,0.5); }
+
+  .results-score {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 14px;
+    color: var(--text-dim);
+    letter-spacing: 3px;
+    margin-bottom: 32px;
+  }
+
+  .badge-earned {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    border: 4px solid var(--gold);
+    margin: 0 auto 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--panel);
+    font-family: 'Orbitron', monospace;
+    font-size: 64px;
+    font-weight: 900;
+    box-shadow: 0 0 60px rgba(255,215,0,0.4);
+    animation: badgePulse 2s ease-in-out infinite;
+    overflow: hidden;
+    position: relative;
+  }
+  @keyframes badgePulse {
+    0%, 100% { box-shadow: 0 0 40px rgba(255,215,0,0.3); }
+    50% { box-shadow: 0 0 80px rgba(255,215,0,0.6); }
+  }
+
+  .narrative-box {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    padding: 24px;
+    text-align: left;
+    margin-bottom: 32px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.7;
+    color: var(--text);
+    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+  }
+
+  .answers-review { margin-bottom: 32px; text-align: left; }
+  .review-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    margin-bottom: 8px;
+    background: var(--panel);
+    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+  }
+  .review-icon { font-size: 16px; flex-shrink: 0; margin-top: 2px; }
+  .review-text { font-family: 'Rajdhani', sans-serif; font-size: 15px; }
+  .review-correct-answer { font-family: 'Share Tech Mono', monospace; font-size: 12px; color: var(--success); margin-top: 4px; }
+
+  .results-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+
+  .btn-secondary {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    padding: 14px 24px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+  }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ===== PROFILE TAB ===== */
+  .profile-section { max-width: 700px; }
+  .profile-header-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--accent);
+    padding: 32px;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    margin-bottom: 32px;
+    clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+  }
+  .profile-avatar {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    border: 3px solid var(--accent);
+    background: var(--bg2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Orbitron', monospace;
+    font-size: 28px;
+    color: var(--accent);
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .profile-name {
+    font-family: 'Orbitron', monospace;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .profile-intuition {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    color: var(--gold);
+    letter-spacing: 2px;
+  }
+
+  .badges-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 12px;
+  }
+  .badge-item {
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Orbitron', monospace;
+    font-size: 20px;
+    font-weight: 700;
+    background: var(--panel);
+    overflow: hidden;
+    position: relative;
+  }
+  .badge-item.earned { border-width: 3px; }
+  .badge-item.locked-badge { opacity: 0.2; filter: grayscale(1); }
+  .badge-item img { width: 100%; height: 100%; object-fit: cover; }
+
+  /* LOADING */
+  .loading-overlay {
+    position: fixed; inset: 0; z-index: 1000;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+  }
+  .loading-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 24px;
+    font-weight: 900;
+    letter-spacing: 4px;
+    color: var(--accent);
+    animation: titlePulse 1.5s ease-in-out infinite;
+  }
+  .loading-bar-container {
+    width: 300px;
+    height: 3px;
+    background: var(--border);
+  }
+  .loading-bar {
+    height: 100%;
+    background: var(--accent);
+    animation: loadBar 1.5s ease-in-out infinite;
+  }
+  @keyframes loadBar {
+    0% { width: 0%; }
+    50% { width: 70%; }
+    100% { width: 100%; }
+  }
+  .loading-text {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+  }
+
+  /* NOTIFICATION */
+  .notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    background: var(--panel);
+    border: 1px solid var(--accent);
+    border-left: 4px solid var(--accent);
+    padding: 16px 24px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    color: var(--text);
+    max-width: 320px;
+    transform: translateX(400px);
+    transition: transform 0.4s ease;
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+  }
+  .notification.show { transform: translateX(0); }
+  .notification.success { border-color: var(--success); }
+  .notification.error { border-color: var(--danger); }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 500;
+    background: rgba(0,0,0,0.85);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--accent);
+    padding: 40px;
+    max-width: 520px;
+    width: 100%;
+    clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+    text-align: center;
+  }
+  .modal-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 16px;
+    letter-spacing: 3px;
+  }
+  .modal-text {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--text);
+    margin-bottom: 32px;
+  }
+  .modal-actions { display: flex; gap: 16px; justify-content: center; }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .choices-grid { grid-template-columns: 1fr; }
+    .matching-cols { grid-template-columns: 1fr; }
+    .game-header { padding: 12px 16px; }
+    .game-content { padding: 20px 16px; }
+    .quiz-body { padding: 24px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-grid"></div>
+<div class="bg-scan"></div>
+
+<!-- LOADING -->
+<div class="loading-overlay" id="loading-overlay">
+  <div class="loading-title">VERBALIA</div>
+  <div class="loading-bar-container"><div class="loading-bar"></div></div>
+  <div class="loading-text">CONNEXION AU RÉSEAU SECRET...</div>
+</div>
+
+<!-- NOTIFICATION -->
+<div class="notification" id="notification"></div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal-box">
+    <div class="modal-title" id="modal-title"></div>
+    <div class="modal-text" id="modal-text"></div>
+    <div class="modal-actions" id="modal-actions"></div>
+  </div>
+</div>
+
+<!-- ===== LOGIN SCREEN ===== -->
+<div class="screen active" id="screen-login">
+  <div class="login-container">
+    <div class="logo-area">
+      <div class="logo-title">MONDE DE<br>VERBALIA</div>
+      <div class="logo-sub">// Réseau des Agents Secrets //</div>
+    </div>
+    <div class="login-panel">
+      <div class="field-group">
+        <div class="field-label">// Numéro d'agent</div>
+        <input type="number" class="login-input" id="login-agent" placeholder="00" min="0" max="42">
+      </div>
+      <div class="field-group">
+        <div class="field-label">// Code d'accès</div>
+        <input type="password" class="login-input" id="login-password" placeholder="•••••" maxlength="5">
+      </div>
+      <button class="btn-primary" onclick="doLogin()">ACCÉDER AU RÉSEAU</button>
+      <div class="login-error" id="login-error">⚠ CODE INVALIDE — ACCÈS REFUSÉ</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MAIN GAME SCREEN ===== -->
+<div class="screen" id="screen-game">
+  <div class="game-header">
+    <div class="header-brand">VERBALIA</div>
+    <div class="header-agent" id="header-agent-label">AGENT —</div>
+    <div class="header-intuition">
+      <span class="intuition-label">INTUITION</span>
+      <span class="intuition-value" id="header-intuition">0</span>
+    </div>
+    <button class="btn-logout" onclick="doLogout()">DÉCONNEXION</button>
+  </div>
+  <div class="game-nav">
+    <button class="nav-btn active" onclick="showTab('modules')" id="tab-modules">MODULES</button>
+    <button class="nav-btn" onclick="showTab('classement')" id="tab-classement">CLASSEMENT</button>
+    <button class="nav-btn" onclick="showTab('profil')" id="tab-profil">MON PROFIL</button>
+  </div>
+  <div class="game-content">
+
+    <!-- MODULES TAB -->
+    <div id="tab-content-modules">
+      <div class="section-title">// Sélectionner un module</div>
+      <div id="modules-container"></div>
+    </div>
+
+    <!-- CLASSEMENT TAB -->
+    <div id="tab-content-classement" style="display:none">
+      <div class="section-title">// Classement des agents</div>
+      <div class="leaderboard-tabs">
+        <button class="lb-tab active" onclick="showLbTab('intuition')" id="lbtab-intuition">INTUITION</button>
+        <button class="lb-tab" onclick="showLbTab('badges')" id="lbtab-badges">BADGES</button>
+      </div>
+      <div id="lb-content"></div>
+    </div>
+
+    <!-- PROFIL TAB -->
+    <div id="tab-content-profil" style="display:none">
+      <div class="section-title">// Dossier agent</div>
+      <div class="profile-section">
+        <div class="profile-header-card">
+          <div class="profile-avatar" id="profile-avatar-display">—</div>
+          <div>
+            <div class="profile-name" id="profile-name-display">AGENT —</div>
+            <div class="profile-intuition" id="profile-intuition-display">0 POINTS D'INTUITION</div>
+          </div>
+        </div>
+        <div class="section-title">// Badges obtenus</div>
+        <div class="badges-grid" id="profile-badges-grid"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== QUIZ SCREEN ===== -->
+<div class="screen" id="screen-quiz">
+  <div class="quiz-header">
+    <div class="quiz-module-info">
+      <div class="quiz-letter" id="quiz-letter">A</div>
+      <div class="quiz-meta">
+        <div class="quiz-nato" id="quiz-nato">ALPHA</div>
+        <div class="quiz-progress-text" id="quiz-progress-text">Question 1 / 10</div>
+      </div>
+    </div>
+    <div class="timer-ring">
+      <svg width="70" height="70" viewBox="0 0 70 70">
+        <circle class="timer-ring-bg" cx="35" cy="35" r="30"/>
+        <circle class="timer-ring-fg" id="timer-ring-fg" cx="35" cy="35" r="30"
+          stroke-dasharray="188.5"
+          stroke-dashoffset="0"/>
+      </svg>
+      <div class="timer-text" id="timer-text">27</div>
+    </div>
+  </div>
+  <div class="quiz-progress-bar">
+    <div class="quiz-progress-fill" id="quiz-progress-fill" style="width:0%"></div>
+  </div>
+  <div class="quiz-body" id="quiz-body"></div>
+</div>
+
+<!-- ===== RESULTS SCREEN ===== -->
+<div class="screen" id="screen-results">
+  <div class="results-container">
+    <div class="results-title" id="results-title">MISSION ACCOMPLIE</div>
+    <div class="results-score" id="results-score"></div>
+    <div class="badge-earned" id="results-badge"></div>
+    <div class="narrative-box" id="results-narrative"></div>
+    <div class="answers-review" id="answers-review"></div>
+    <div class="results-actions">
+      <button class="btn-secondary" onclick="goToModules()">← RETOUR AUX MODULES</button>
+      <button class="btn-primary" id="btn-retry" onclick="retryModule()">RÉESSAYER</button>
+      <button class="btn-primary" id="btn-next-module" onclick="goToNextModule()" style="display:none">MODULE SUIVANT →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// CONFIG — Remplace par ton URL Google Apps Script
+// ============================================================
+const CONFIG = {
+  SCRIPT_URL: 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE',
+  TIMER_SECONDS: 27
+};
+
+// ============================================================
+// NATO + CHAKRAS DATA
+// ============================================================
+const NATO = ['Alpha','Bravo','Charlie','Delta','Echo','Foxtrot','Golf','Hotel',
+  'India','Juliet','Kilo','Lima','Mike','November','Oscar','Papa',
+  'Quebec','Romeo','Sierra','Tango','Uniform','Victor','Whiskey',
+  'X-ray','Yankee','Zulu'];
+
+const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+
+const CHAKRA_MAP = {
+  0:'1',1:'1',2:'1',3:'1',
+  4:'2',5:'2',6:'2',7:'2',
+  8:'3',9:'3',10:'3',11:'3',
+  12:'4',13:'4',14:'4',15:'4',
+  16:'5',17:'5',18:'5',19:'5',
+  20:'6',21:'6',22:'6',
+  23:'7',24:'7',25:'7'
+};
+
+const CHAKRA_COLORS = {
+  '1':'#FF0000','2':'#FF7F00','3':'#FFD700',
+  '4':'#00C853','5':'#00BFFF','6':'#4B0082','7':'#9B59B6'
+};
+
+const CHAKRA_NAMES = {
+  '1':'Racine','2':'Sacré','3':'Plexus Solaire',
+  '4':'Cœur','5':'Gorge','6':'Troisième Œil','7':'Couronne'
+};
+
+const NARRATIVES = {
+  A: "Le monde de Verbalia sombre dans le silence. Les mots s'effacent. Les livres se vident. Un sinistre génie — qu'on appelle L'Effaceur — a volé la compétence langagière de tout un peuple. Tu es notre dernier espoir. Le Quartier Général t'a choisi, toi. Agent, ta mission commence maintenant. Es-tu prêt à entrer dans la zone?",
+  B: "Tu pénètres dans la Zone Grise, là où les premières lettres ont disparu. Les habitants murmurent des sons sans sens. Tu réussis à décoder un premier message crypté : « Il se cache là où les mots sont nés. » Ton cœur s'emballe. Mais une ombre te suit depuis ton départ. Tu n'es pas seul dans cette zone...",
+  C: "L'ombre se révèle : c'est Mira, une agente que L'Effaceur a retournée contre nous. Elle te tend un piège dans les Archives Oubliées. Tu t'en sors de justesse, mais elle s'échappe avec une carte — la carte du Sanctuaire des Syllabes. Sans elle, la prochaine zone sera impossible à traverser. Le temps presse. Très peu de temps.",
+  D: "Le QG t'annonce une nouvelle bouleversante : quelqu'un à l'intérieur a transmis ta position à L'Effaceur. Un traître parmi les agents. Tu dois continuer seul, sans communication, sans filet. Dans les ruines de la Bibliothèque Centrale, tu trouves un indice gravé dans la pierre : trois mots en latin que personne ne peut encore lire. Personne... sauf toi?",
+  E: "Dans les souterrains de Verbalia, tu découvres un groupe de résistants — les Scribes de l'Ombre. Ils ont protégé quelques fragments du langage dans des capsules de verre. Leur chef, une vieille femme nommée Elara, te remet une capsule en tremblant : « Si elle se brise, tout est perdu. » Tu la glisses dans ta poche. Elle est déjà fissurée.",
+  F: "L'Effaceur a lancé ses Drones Silencieux — des machines qui absorbent les derniers mots écrits sur les murs, les panneaux, les visages des gens. Tu dois en neutraliser trois avant l'aube. Tu en neutralises deux. Le troisième s'échappe... en direction du dernier dépôt de mots connu. Si ce dépôt tombe, Verbalia sera muette pour toujours.",
+  G: "Tu arrives au dépôt juste à temps — mais L'Effaceur y était déjà. Il n'a pas tout pris. Il a laissé quelque chose : un mot unique, encadré de lumière, posé sur un piédestal. Un mot que personne ne comprend encore. Les Scribes disent que c'est le mot-clé du Sanctuaire. Mira réapparaît derrière toi, mais cette fois... elle baisse les armes.",
+  H: "Mira n'est pas une ennemie. Elle était prisonnière de L'Effaceur depuis des années. Elle connaît son repaire, ses failles, son vrai nom. Ensemble, vous formez une alliance fragile mais puissante. Elle te confie : « Il a une faiblesse. Un seul mot peut le détruire. Mais ce mot... il l'a effacé en premier. » Comment retrouver ce qui n'existe plus?",
+  I: "Mira et toi pénétrez dans le Labyrinthe des Lettres — une structure mentale construite par L'Effaceur pour piéger les agents trop curieux. Les murs changent. Les mots se retournent. Tu dois garder ton esprit clair, ton langage précis. Un faux pas verbal et le labyrinthe t'absorbe. Tu en sors transformé. Quelque chose en toi s'est éveillé. Quelque chose de puissant.",
+  J: "Au cœur du labyrinthe, tu trouves le Miroir des Origines — un artefact qui montre comment Verbalia était avant. Des rues remplies de poèmes. Des enfants qui récitent. Des rires et des histoires. Une larme coule sur ta joue. Puis le miroir se fissure. L'Effaceur sait que tu l'as vu. Et il est furieux. Plus furieux que jamais.",
+  K: "L'Effaceur envoie son arme ultime : Le Vide — une zone où même les pensées s'éteignent. Elara disparaît dedans pour te protéger. Tu la cherches. Tu cries son nom. Rien. Mira te retient : « On ne peut pas la sauver maintenant. Mais on peut faire en sorte que son sacrifice serve à quelque chose. » Tu serres les dents. Tu continues.",
+  L: "Dans les affaires d'Elara, tu trouves un carnet codé. Après des heures de déchiffrement, un message apparaît : le mot effacé en premier se trouve dans la mémoire d'un enfant — un enfant qui n'a jamais appris à oublier. Son nom : Léo, 7 ans, secteur 4. Un enfant contre L'Effaceur. L'espoir prend parfois des formes inattendues.",
+  M: "Léo est un garçon silencieux aux yeux immenses. Il ne parle pas, mais il écrit — partout, tout le temps, sur tout. Les murs de sa chambre sont couverts de mots que personne d'autre ne se souvient. Il te regarde longuement, puis il écrit sur ta main : « Tu cherches le mot ORIGINE. » Un frisson parcourt ton échine. C'est lui. C'était lui depuis le début.",
+  N: "ORIGINE. Sept lettres. Un pouvoir immense. Avec ce mot, on peut reconstruire tout ce qui a été effacé — mais seulement si on le prononce au bon endroit, au bon moment. Mira connaît l'endroit : la Tour du Premier Mot, au centre de Verbalia. Mais L'Effaceur la surveille nuit et jour. Y entrer semble impossible. Semble.",
+  O: "Vous élaborez un plan audacieux. Mira crée une distraction. Léo dessine un plan des tunnels secrets sous la Tour. Toi, tu t'infiltres. Mais à mi-chemin, une alarme retentit. Quelqu'un a vendu le plan. Le traître du QG a encore frappé. Tu es cerné. Les portes se ferment une à une. Il ne reste qu'une issue... et elle mène directement à L'Effaceur.",
+  P: "Pour la première fois, tu vois L'Effaceur en vrai. Il est plus vieux que tu l'imaginais. Plus triste, aussi. Il te dit : « J'ai effacé les mots pour effacer la souffrance. Les mots blessent. Les mots détruisent. » Il n'est pas fou. Il est brisé. Et cette réalisation est plus dangereuse que n'importe quel piège — parce qu'elle t'ébranle.",
+  Q: "Ses paroles résonnent en toi. Et si les mots faisaient vraiment plus de mal que de bien? Mira te retrouve, désemparée : « Il t'a parlé, n'est-ce pas? Il fait ça à tous. C'est son vrai pouvoir — le doute. » Tu dois choisir : croire en la force des mots, ou le laisser gagner. Léo t'envoie un message. Un seul mot : COURAGE.",
+  R: "Le traître du QG se révèle enfin : c'est l'Agent 00 — le prédécesseur, celui qu'on croyait mort. L'Effaceur l'avait retourné avec les mêmes arguments. Il surgit armé. La confrontation est brutale. Tu t'en sors, lui non. Dans sa poche : les codes d'accès à la salle centrale de la Tour. La voie est ouverte. Mais tu es seul, épuisé et à court de temps.",
+  S: "Tu entres dans la Salle des Mots Perdus. Des millions de fragments lumineux flottent dans l'air — chaque mot volé à Verbalia. C'est à couper le souffle. Et au centre, une machine immense pulse comme un cœur. C'est elle qui absorbe tout. Pour la détruire, il faut prononcer ORIGINE à voix haute devant elle. Mais L'Effaceur t'attend de l'autre côté.",
+  T: "L'Effaceur active la machine en mode purge finale. En quelques minutes, les derniers mots de Verbalia seront effacés à jamais. Mira tente de l'arrêter — il la neutralise. Léo apparaît derrière toi, tremblant. L'Effaceur ricane : « Prononce ton mot, Agent. Et je l'efface aussi. » Il tient Léo en otage. Ton cœur s'arrête. Que fais-tu?",
+  U: "Tu poses ton arme. Tu avances. Tu dis à L'Effaceur : « Les mots ne blessent pas. Ce sont les silences qui tuent. » Il hésite. Une seconde. Léo en profite pour appuyer sur le panneau d'urgence. La machine se coupe. L'Effaceur hurle. Mira se relève. Dans la confusion, tu atteins le centre de la salle. ORIGINE est sur tes lèvres. Une seule chance.",
+  V: "Tu prononces ORIGINE à voix haute. La salle tremble. Les fragments lumineux tourbillonnent. La machine explose en silence — une explosion de lumière, pas de destruction. Les mots commencent à revenir. Lentement. Sur les murs. Dans l'air. Dans les yeux des gens à l'extérieur. L'Effaceur s'effondre, vieilli de vingt ans en quelques secondes. Mais quelque chose cloche encore...",
+  W: "Les mots reviennent — mais pas tous. Un trou noir subsiste dans la machine. L'Effaceur, dans un dernier acte désespéré, a verrouillé une partie du langage dans un cristal d'oubli qu'il a avalé. Pour libérer ces derniers mots, il faudrait... qu'il les donne lui-même, volontairement. Et ça, personne n'y croit. Personne, sauf peut-être Léo.",
+  X: "Léo s'approche de L'Effaceur et lui écrit dans la main : « Tu avais peur. Moi aussi j'avais peur. Les mots m'ont sauvé. » Un long silence. Une larme — la première depuis des années — coule sur le visage de L'Effaceur. Il ouvre la bouche. Et pour la première fois depuis longtemps, il parle. Sa voix est brisée. Mais elle est là.",
+  Y: "L'Effaceur restitue le cristal d'oubli. Les derniers mots jaillissent comme une rivière longtemps retenue. Dans toute Verbalia, les gens s'arrêtent. Ils ouvrent la bouche. Ils retrouvent leurs phrases, leurs histoires, leurs chansons. Des pleurs. Des rires. Des embrassades. La langue revient. Et avec elle, quelque chose d'encore plus précieux : le désir de s'en servir avec soin.",
+  Z: "Le QG te transmet un dernier message : « Mission accomplie, Agent. Verbalia est sauvée. » Mais tu regardes Léo qui écrit sur un mur tout neuf, Mira qui rit pour la première fois, et L'Effaceur qui apprend à lire un livre d'enfant. Tu souris. Ce n'est pas toi qui as sauvé Verbalia. C'est le pouvoir des mots — et ceux qui ont eu le courage de les défendre. Jusqu'au bout."
+};
+
+// ============================================================
+// STATE
+// ============================================================
+let state = {
+  currentAgent: null,
+  agents: [],
+  modules: {},    // { A: { questions:[], passPct:70, image:null, narrative:'' }, ... }
+  currentModule: null,
+  currentQuestions: [],
+  currentQuestionIndex: 0,
+  currentAnswers: [],
+  timerInterval: null,
+  timeLeft: 27,
+  selectedMatchLeft: null
+};
+
+// ============================================================
+// API CALLS
+// ============================================================
+async function apiCall(action, data = {}) {
+  try {
+    const params = new URLSearchParams({ action, ...data });
+    const res = await fetch(CONFIG.SCRIPT_URL + '?' + params.toString());
+    return await res.json();
+  } catch(e) {
+    console.error('API Error:', e);
+    return { success: false, error: e.message };
+  }
+}
+
+async function apiPost(action, data = {}) {
+  try {
+    const body = JSON.stringify({ action, ...data });
+    const res = await fetch(CONFIG.SCRIPT_URL, {
+      method: 'POST',
+      body,
+      headers: { 'Content-Type': 'application/json' }
+    });
+    return await res.json();
+  } catch(e) {
+    console.error('API Error:', e);
+    return { success: false, error: e.message };
+  }
+}
+
+// ============================================================
+// INIT
+// ============================================================
+window.addEventListener('load', async () => {
+  // Check if already logged in (session)
+  const saved = sessionStorage.getItem('verbalia_agent');
+  if (saved) {
+    state.currentAgent = JSON.parse(saved);
+    await loadGameData();
+  } else {
+    hideLoading();
+  }
+});
+
+function hideLoading() {
+  document.getElementById('loading-overlay').style.display = 'none';
+}
+
+async function loadGameData() {
+  showLoading('CHARGEMENT DES DONNÉES...');
+  const res = await apiCall('getData');
+  if (res.success) {
+    state.agents = res.agents || [];
+    state.modules = res.modules || {};
+    // Update current agent data
+    const me = state.agents.find(a => a.id == state.currentAgent.id);
+    if (me) state.currentAgent = { ...state.currentAgent, ...me };
+    sessionStorage.setItem('verbalia_agent', JSON.stringify(state.currentAgent));
+    hideLoading();
+    showScreen('game');
+    renderGame();
+  } else {
+    hideLoading();
+    showNotification('Erreur de connexion au réseau', 'error');
+    showScreen('login');
+  }
+}
+
+// ============================================================
+// AUTH
+// ============================================================
+async function doLogin() {
+  const agentNum = document.getElementById('login-agent').value.trim();
+  const password = document.getElementById('login-password').value.trim();
+
+  if (!agentNum || !password) {
+    showLoginError();
+    return;
+  }
+
+  showLoading('VÉRIFICATION DU CODE...');
+  const res = await apiCall('login', { agentId: agentNum, password });
+  if (res.success) {
+    state.currentAgent = res.agent;
+    sessionStorage.setItem('verbalia_agent', JSON.stringify(res.agent));
+
+    // Admin redirect
+    if (res.agent.id == 0) {
+      hideLoading();
+      window.location.href = 'admin.html';
+      return;
+    }
+
+    await loadGameData();
+  } else {
+    hideLoading();
+    showLoginError();
+  }
+}
+
+function showLoginError() {
+  const el = document.getElementById('login-error');
+  el.style.display = 'block';
+  el.style.animation = 'none';
+  setTimeout(() => el.style.animation = 'shake 0.3s ease', 10);
+}
+
+function doLogout() {
+  sessionStorage.removeItem('verbalia_agent');
+  state.currentAgent = null;
+  showScreen('login');
+  document.getElementById('login-agent').value = '';
+  document.getElementById('login-password').value = '';
+  document.getElementById('login-error').style.display = 'none';
+}
+
+// ============================================================
+// RENDER GAME
+// ============================================================
+function renderGame() {
+  const agent = state.currentAgent;
+  document.getElementById('header-agent-label').textContent = `AGENT ${agent.id}`;
+  document.getElementById('header-intuition').textContent = agent.intuition || 0;
+
+  renderModules();
+  renderProfile();
+}
+
+function renderModules() {
+  const container = document.getElementById('modules-container');
+  container.innerHTML = '';
+
+  const agent = state.currentAgent;
+  const badgeLevel = agent.badgeLevel || 0; // index of highest badge earned (0 = none, 1 = A done, etc.)
+
+  // Group by chakra
+  const chakraGroups = {};
+  LETTERS.forEach((letter, i) => {
+    const chakra = CHAKRA_MAP[i];
+    if (!chakraGroups[chakra]) chakraGroups[chakra] = [];
+    chakraGroups[chakra].push({ letter, nato: NATO[i], index: i });
+  });
+
+  Object.entries(chakraGroups).forEach(([chakra, items]) => {
+    const color = CHAKRA_COLORS[chakra];
+    const name = CHAKRA_NAMES[chakra];
+
+    const group = document.createElement('div');
+    group.className = 'chakra-group';
+    group.innerHTML = `<div class="chakra-label" style="color:${color};border-color:${color}">${name}</div>`;
+
+    const row = document.createElement('div');
+    row.className = 'modules-row';
+
+    items.forEach(({ letter, nato, index }) => {
+      const hasContent = state.modules[letter] && state.modules[letter].questions && state.modules[letter].questions.length > 0;
+      const isCompleted = (agent.completedModules || []).includes(letter);
+      const isUnlocked = index === 0 || (agent.completedModules || []).includes(LETTERS[index - 1]);
+      const isAvailable = hasContent && isUnlocked;
+
+      const card = document.createElement('div');
+      card.className = 'module-card';
+      if (!hasContent) card.classList.add('no-content');
+      else if (!isUnlocked) card.classList.add('locked');
+      else if (isCompleted) card.classList.add('completed');
+
+      const moduleImg = state.modules[letter]?.image;
+
+      card.innerHTML = `
+        ${moduleImg
+          ? `<img class="module-badge-img" src="${moduleImg}" style="border-color:${color}" alt="${letter}">`
+          : `<div class="module-letter" style="color:${color}">${letter}</div>`
+        }
+        <div class="module-nato">${nato}</div>
+      `;
+
+      if (isAvailable) {
+        card.addEventListener('click', () => startModule(letter));
+      }
+
+      row.appendChild(card);
+    });
+
+    group.appendChild(row);
+    container.appendChild(group);
+  });
+}
+
+function renderProfile() {
+  const agent = state.currentAgent;
+  document.getElementById('profile-name-display').textContent = `AGENT ${agent.id}`;
+  document.getElementById('profile-intuition-display').textContent = `${agent.intuition || 0} POINTS D'INTUITION`;
+
+  const avatarEl = document.getElementById('profile-avatar-display');
+  if (agent.avatar) {
+    avatarEl.innerHTML = `<img src="${agent.avatar}" alt="Agent ${agent.id}">`;
+  } else {
+    avatarEl.textContent = agent.id;
+  }
+
+  const grid = document.getElementById('profile-badges-grid');
+  grid.innerHTML = '';
+  LETTERS.forEach((letter, i) => {
+    const color = CHAKRA_COLORS[CHAKRA_MAP[i]];
+    const isEarned = (agent.completedModules || []).includes(letter);
+    const moduleImg = state.modules[letter]?.image;
+
+    const item = document.createElement('div');
+    item.className = 'badge-item ' + (isEarned ? 'earned' : 'locked-badge');
+    if (isEarned) item.style.borderColor = color;
+
+    if (isEarned && moduleImg) {
+      item.innerHTML = `<img src="${moduleImg}" alt="${letter}">`;
+    } else {
+      item.style.color = isEarned ? color : '';
+      item.textContent = letter;
+    }
+
+    grid.appendChild(item);
+  });
+}
+
+// ============================================================
+// LEADERBOARD
+// ============================================================
+function showTab(tab) {
+  ['modules','classement','profil'].forEach(t => {
+    document.getElementById(`tab-content-${t}`).style.display = t === tab ? 'block' : 'none';
+    document.getElementById(`tab-${t}`).classList.toggle('active', t === tab);
+  });
+  if (tab === 'classement') renderLeaderboard('intuition');
+  if (tab === 'profil') renderProfile();
+}
+
+let currentLbTab = 'intuition';
+function showLbTab(tab) {
+  currentLbTab = tab;
+  document.getElementById('lbtab-intuition').classList.toggle('active', tab === 'intuition');
+  document.getElementById('lbtab-badges').classList.toggle('active', tab === 'badges');
+  renderLeaderboard(tab);
+}
+
+function renderLeaderboard(type) {
+  const container = document.getElementById('lb-content');
+  container.innerHTML = '';
+
+  const players = state.agents.filter(a => a.id != 0);
+
+  let sorted;
+  if (type === 'intuition') {
+    sorted = [...players].sort((a, b) => (b.intuition || 0) - (a.intuition || 0));
+  } else {
+    sorted = [...players].sort((a, b) => {
+      const aLevel = (b.completedModules || []).length;
+      const bLevel = (a.completedModules || []).length;
+      return aLevel - bLevel;
+    }).reverse();
+  }
+
+  sorted.forEach((agent, i) => {
+    const rank = i + 1;
+    const isMe = agent.id == state.currentAgent.id;
+    const row = document.createElement('div');
+    row.className = 'lb-row' + (isMe ? ' me' : '');
+
+    const rankClass = rank === 1 ? 'top1' : rank === 2 ? 'top2' : rank === 3 ? 'top3' : '';
+    const completed = (agent.completedModules || []);
+    const lastBadge = completed.length > 0 ? completed[completed.length - 1] : '—';
+    const lastBadgeIndex = LETTERS.indexOf(lastBadge);
+    const badgeColor = lastBadgeIndex >= 0 ? CHAKRA_COLORS[CHAKRA_MAP[lastBadgeIndex]] : 'var(--border)';
+
+    let avatarContent = agent.avatar
+      ? `<img src="${agent.avatar}" alt="A${agent.id}">`
+      : agent.id;
+
+    row.innerHTML = `
+      <div class="lb-rank ${rankClass}">${rank}</div>
+      <div class="lb-avatar">${avatarContent}</div>
+      <div class="lb-agent">AGENT ${agent.id}${isMe ? ' <span style="color:var(--accent);font-size:10px">(MOI)</span>' : ''}</div>
+      ${type === 'intuition'
+        ? `<div class="lb-score">${agent.intuition || 0}</div>`
+        : `<div class="lb-badge-level" style="color:${badgeColor}">${lastBadge !== '—' ? lastBadge + ' — ' + NATO[LETTERS.indexOf(lastBadge)] : '—'}<br><span style="color:var(--text-dim);font-size:10px">${completed.length} badge${completed.length !== 1 ? 's' : ''}</span></div>`
+      }
+    `;
+    container.appendChild(row);
+  });
+
+  if (sorted.length === 0) {
+    container.innerHTML = '<div style="color:var(--text-dim);font-family:Share Tech Mono,monospace;font-size:13px;padding:20px">Aucun agent classé pour l\'instant.</div>';
+  }
+}
+
+// ============================================================
+// QUIZ ENGINE
+// ============================================================
+function startModule(letter) {
+  const module = state.modules[letter];
+  if (!module || !module.questions || module.questions.length === 0) return;
+
+  state.currentModule = letter;
+  state.currentQuestions = shuffle([...module.questions]);
+  state.currentQuestionIndex = 0;
+  state.currentAnswers = [];
+
+  const idx = LETTERS.indexOf(letter);
+  const color = CHAKRA_COLORS[CHAKRA_MAP[idx]];
+
+  document.getElementById('quiz-letter').textContent = letter;
+  document.getElementById('quiz-letter').style.color = color;
+  document.getElementById('quiz-nato').textContent = NATO[idx];
+
+  showScreen('quiz');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = state.currentQuestions[state.currentQuestionIndex];
+  const total = state.currentQuestions.length;
+  const current = state.currentQuestionIndex + 1;
+
+  document.getElementById('quiz-progress-text').textContent = `Question ${current} / ${total}`;
+  document.getElementById('quiz-progress-fill').style.width = `${((current - 1) / total) * 100}%`;
+
+  const body = document.getElementById('quiz-body');
+  body.innerHTML = '';
+
+  // Question text
+  const qText = document.createElement('div');
+  qText.className = 'question-text';
+  qText.textContent = q.question;
+  body.appendChild(qText);
+
+  // Question image
+  if (q.image) {
+    const img = document.createElement('img');
+    img.className = 'question-image';
+    img.src = q.image;
+    body.appendChild(img);
+  }
+
+  // Render by type
+  switch (q.type) {
+    case 'mcq': renderMCQ(body, q); break;
+    case 'tf': renderTF(body, q); break;
+    case 'short': renderShort(body, q); break;
+    case 'match': renderMatch(body, q); break;
+    case 'number': renderNumber(body, q); break;
+    default: renderMCQ(body, q);
+  }
+
+  // Start timer
+  startTimer();
+}
+
+function renderMCQ(body, q) {
+  const grid = document.createElement('div');
+  grid.className = 'choices-grid';
+  const letters = ['A','B','C','D'];
+  const shuffledChoices = shuffle([...q.choices]);
+
+  shuffledChoices.forEach((choice, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.innerHTML = `<span class="choice-letter">${letters[i]}.</span>${choice}`;
+    btn.addEventListener('click', () => handleMCQAnswer(choice, q.answer, shuffledChoices));
+    grid.appendChild(btn);
+  });
+  body.appendChild(grid);
+}
+
+function handleMCQAnswer(choice, answer, choices) {
+  stopTimer();
+  const buttons = document.querySelectorAll('.choice-btn');
+  const correct = choice === answer;
+
+  buttons.forEach(btn => {
+    btn.disabled = true;
+    const btnText = btn.textContent.replace(/^[A-D]\./,'').trim();
+    if (btnText === answer) btn.classList.add('correct');
+    else if (btnText === choice && !correct) btn.classList.add('wrong');
+  });
+
+  recordAnswer(correct, answer);
+  showFeedback(correct, answer);
+  setTimeout(() => nextQuestion(), 1800);
+}
+
+function renderTF(body, q) {
+  const grid = document.createElement('div');
+  grid.className = 'tf-grid';
+  ['Vrai','Faux'].forEach(val => {
+    const btn = document.createElement('button');
+    btn.className = 'tf-btn';
+    btn.textContent = val;
+    btn.addEventListener('click', () => handleTFAnswer(val, q.answer));
+    grid.appendChild(btn);
+  });
+  body.appendChild(grid);
+}
+
+function handleTFAnswer(choice, answer) {
+  stopTimer();
+  const buttons = document.querySelectorAll('.tf-btn');
+  const correct = choice === answer;
+  buttons.forEach(btn => {
+    btn.disabled = true;
+    if (btn.textContent === answer) btn.classList.add('correct');
+    else if (btn.textContent === choice && !correct) btn.classList.add('wrong');
+  });
+  recordAnswer(correct, answer);
+  showFeedback(correct, answer);
+  setTimeout(() => nextQuestion(), 1800);
+}
+
+function renderShort(body, q) {
+  const area = document.createElement('div');
+  area.className = 'short-answer-area';
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'short-input';
+  input.placeholder = 'Ta réponse...';
+  input.id = 'short-input';
+
+  const btn = document.createElement('button');
+  btn.className = 'btn-submit';
+  btn.textContent = 'CONFIRMER';
+
+  const submit = () => {
+    const val = input.value.trim();
+    if (!val) return;
+    stopTimer();
+    input.disabled = true;
+    btn.disabled = true;
+    const correct = val.toLowerCase() === q.answer.toLowerCase();
+    recordAnswer(correct, q.answer);
+    showFeedback(correct, q.answer);
+    setTimeout(() => nextQuestion(), 2000);
+  };
+
+  btn.addEventListener('click', submit);
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+
+  area.appendChild(input);
+  area.appendChild(btn);
+  body.appendChild(area);
+  setTimeout(() => input.focus(), 100);
+}
+
+function renderNumber(body, q) {
+  const area = document.createElement('div');
+  area.className = 'short-answer-area';
+  const input = document.createElement('input');
+  input.type = 'number';
+  input.className = 'short-input';
+  input.placeholder = '0-9';
+  input.min = 0; input.max = 9;
+  input.id = 'number-input';
+  input.style.maxWidth = '200px';
+
+  const btn = document.createElement('button');
+  btn.className = 'btn-submit';
+  btn.textContent = 'CONFIRMER';
+
+  const submit = () => {
+    const val = input.value.trim();
+    if (val === '') return;
+    stopTimer();
+    input.disabled = true; btn.disabled = true;
+    const correct = parseInt(val) === parseInt(q.answer);
+    recordAnswer(correct, q.answer);
+    showFeedback(correct, q.answer);
+    setTimeout(() => nextQuestion(), 2000);
+  };
+
+  btn.addEventListener('click', submit);
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+  area.appendChild(input);
+  area.appendChild(btn);
+  body.appendChild(area);
+  setTimeout(() => input.focus(), 100);
+}
+
+function renderMatch(body, q) {
+  const area = document.createElement('div');
+  area.className = 'matching-area';
+  const cols = document.createElement('div');
+  cols.className = 'matching-cols';
+
+  const leftCol = document.createElement('div');
+  leftCol.innerHTML = '<div class="matching-col-title">// Colonne A</div>';
+  const rightCol = document.createElement('div');
+  rightCol.innerHTML = '<div class="matching-col-title">// Colonne B</div>';
+
+  const pairs = q.pairs; // [{left, right}]
+  const shuffledRight = shuffle(pairs.map(p => p.right));
+  const matched = {}; // left -> right (user selections)
+  let selectedLeft = null;
+
+  pairs.forEach(pair => {
+    const item = document.createElement('div');
+    item.className = 'match-item';
+    item.textContent = pair.left;
+    item.dataset.value = pair.left;
+    item.addEventListener('click', () => {
+      if (item.classList.contains('matched-correct')) return;
+      document.querySelectorAll('.match-item.selected').forEach(el => {
+        if (el.closest('.matching-cols') && el !== item) el.classList.remove('selected');
+      });
+      selectedLeft = pair.left;
+      item.classList.toggle('selected');
+    });
+    leftCol.appendChild(item);
+  });
+
+  shuffledRight.forEach(right => {
+    const item = document.createElement('div');
+    item.className = 'match-item';
+    item.textContent = right;
+    item.dataset.value = right;
+    item.addEventListener('click', () => {
+      if (!selectedLeft || item.classList.contains('matched-correct')) return;
+      const correctPair = pairs.find(p => p.left === selectedLeft);
+      const isCorrect = correctPair && correctPair.right === right;
+
+      const leftItem = [...leftCol.querySelectorAll('.match-item')].find(el => el.dataset.value === selectedLeft);
+
+      if (isCorrect) {
+        item.classList.add('matched-correct');
+        leftItem?.classList.remove('selected');
+        leftItem?.classList.add('matched-correct');
+        matched[selectedLeft] = right;
+      } else {
+        item.classList.add('matched-wrong');
+        leftItem?.classList.add('matched-wrong');
+        setTimeout(() => {
+          item.classList.remove('matched-wrong');
+          leftItem?.classList.remove('matched-wrong', 'selected');
+        }, 600);
+      }
+
+      selectedLeft = null;
+
+      // Check if all matched
+      if (Object.keys(matched).length === pairs.length) {
+        stopTimer();
+        const allCorrect = pairs.every(p => matched[p.left] === p.right);
+        recordAnswer(allCorrect, 'Tous les éléments');
+        showFeedback(allCorrect, '');
+        setTimeout(() => nextQuestion(), 2000);
+      }
+    });
+    rightCol.appendChild(item);
+  });
+
+  cols.appendChild(leftCol);
+  cols.appendChild(rightCol);
+  area.appendChild(cols);
+  body.appendChild(area);
+}
+
+function showFeedback(correct, correctAnswer) {
+  const existing = document.getElementById('feedback-el');
+  if (existing) existing.remove();
+
+  const fb = document.createElement('div');
+  fb.id = 'feedback-el';
+  fb.className = 'feedback-bar ' + (correct ? 'correct' : 'wrong');
+  fb.innerHTML = correct
+    ? `✓ CORRECT — +1 INTUITION`
+    : `✗ INCORRECT${correctAnswer ? ` — Réponse : <strong>${correctAnswer}</strong>` : ''}`;
+
+  document.getElementById('quiz-body').appendChild(fb);
+}
+
+function recordAnswer(correct, correctAnswer) {
+  const q = state.currentQuestions[state.currentQuestionIndex];
+  state.currentAnswers.push({
+    question: q.question,
+    correct,
+    correctAnswer
+  });
+}
+
+function nextQuestion() {
+  state.currentQuestionIndex++;
+  if (state.currentQuestionIndex >= state.currentQuestions.length) {
+    endQuiz();
+  } else {
+    renderQuestion();
+  }
+}
+
+// ============================================================
+// TIMER
+// ============================================================
+function startTimer() {
+  stopTimer();
+  state.timeLeft = CONFIG.TIMER_SECONDS;
+  updateTimerUI();
+
+  state.timerInterval = setInterval(() => {
+    state.timeLeft--;
+    updateTimerUI();
+    if (state.timeLeft <= 0) {
+      stopTimer();
+      timeOut();
+    }
+  }, 1000);
+}
+
+function stopTimer() {
+  if (state.timerInterval) {
+    clearInterval(state.timerInterval);
+    state.timerInterval = null;
+  }
+}
+
+function updateTimerUI() {
+  const total = CONFIG.TIMER_SECONDS;
+  const left = state.timeLeft;
+  const circumference = 188.5;
+  const offset = circumference * (1 - left / total);
+
+  const ring = document.getElementById('timer-ring-fg');
+  const text = document.getElementById('timer-text');
+  if (!ring || !text) return;
+
+  ring.style.strokeDashoffset = offset;
+  text.textContent = left;
+
+  if (left <= 7) {
+    ring.style.stroke = 'var(--danger)';
+    text.style.color = 'var(--danger)';
+  } else if (left <= 14) {
+    ring.style.stroke = 'var(--gold)';
+    text.style.color = 'var(--gold)';
+  } else {
+    ring.style.stroke = 'var(--accent)';
+    text.style.color = 'var(--accent)';
+  }
+}
+
+function timeOut() {
+  const q = state.currentQuestions[state.currentQuestionIndex];
+  recordAnswer(false, q.answer || '');
+  showFeedback(false, q.answer || '');
+
+  // Disable all inputs
+  document.querySelectorAll('.choice-btn, .tf-btn, .btn-submit, .short-input, .number-input').forEach(el => el.disabled = true);
+  setTimeout(() => nextQuestion(), 1800);
+}
+
+// ============================================================
+// END QUIZ
+// ============================================================
+async function endQuiz() {
+  const letter = state.currentModule;
+  const module = state.modules[letter];
+  const answers = state.currentAnswers;
+  const total = answers.length;
+  const correct = answers.filter(a => a.correct).length;
+  const pct = Math.round((correct / total) * 100);
+  const passed = pct >= (module.passPct || 70);
+  const intuitionEarned = correct;
+
+  showScreen('results');
+
+  document.getElementById('results-title').textContent = passed ? '🎯 MISSION ACCOMPLIE' : '⚠ MISSION ÉCHOUÉE';
+  document.getElementById('results-title').className = 'results-title ' + (passed ? 'success' : 'failure');
+  document.getElementById('results-score').textContent = `${correct} / ${total} CORRECT — ${pct}% — SEUIL : ${module.passPct || 70}%`;
+
+  // Badge display
+  const idx = LETTERS.indexOf(letter);
+  const color = CHAKRA_COLORS[CHAKRA_MAP[idx]];
+  const badgeEl = document.getElementById('results-badge');
+  if (module.image) {
+    badgeEl.innerHTML = `<img src="${module.image}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" alt="${letter}">`;
+    badgeEl.style.borderColor = passed ? color : 'var(--border)';
+  } else {
+    badgeEl.textContent = letter;
+    badgeEl.style.color = color;
+    badgeEl.style.borderColor = passed ? color : 'var(--border)';
+  }
+  if (!passed) badgeEl.style.filter = 'grayscale(1) opacity(0.4)';
+  else badgeEl.style.filter = '';
+
+  // Narrative
+  document.getElementById('results-narrative').textContent = passed
+    ? (NARRATIVES[letter] || '')
+    : `Résultat insuffisant. Tu as obtenu ${pct}%, mais le seuil requis est de ${module.passPct || 70}%. La mission continue — renforce tes compétences et reviens plus fort, Agent.`;
+
+  // Review
+  const reviewEl = document.getElementById('answers-review');
+  reviewEl.innerHTML = '<div class="section-title" style="margin-bottom:16px">// Résumé des réponses</div>';
+  answers.forEach(a => {
+    const item = document.createElement('div');
+    item.className = 'review-item';
+    item.innerHTML = `
+      <div class="review-icon">${a.correct ? '✓' : '✗'}</div>
+      <div>
+        <div class="review-text">${a.question}</div>
+        ${!a.correct && a.correctAnswer ? `<div class="review-correct-answer">Bonne réponse : ${a.correctAnswer}</div>` : ''}
+      </div>
+    `;
+    reviewEl.appendChild(item);
+  });
+
+  // Buttons
+  document.getElementById('btn-retry').style.display = 'inline-block';
+  const nextIdx = idx + 1;
+  const nextLetter = LETTERS[nextIdx];
+  const nextBtn = document.getElementById('btn-next-module');
+  if (passed && nextLetter && state.modules[nextLetter]) {
+    nextBtn.style.display = 'inline-block';
+  } else {
+    nextBtn.style.display = 'none';
+  }
+
+  // Save to backend
+  if (passed) {
+    await apiPost('completeModule', {
+      agentId: state.currentAgent.id,
+      module: letter,
+      intuitionEarned
+    });
+    // Update local state
+    if (!state.currentAgent.completedModules) state.currentAgent.completedModules = [];
+    if (!state.currentAgent.completedModules.includes(letter)) {
+      state.currentAgent.completedModules.push(letter);
+    }
+    state.currentAgent.intuition = (state.currentAgent.intuition || 0) + intuitionEarned;
+    sessionStorage.setItem('verbalia_agent', JSON.stringify(state.currentAgent));
+    showNotification(`+${intuitionEarned} INTUITION GAGNÉE!`, 'success');
+  } else {
+    // Still save intuition for this attempt
+    await apiPost('addIntuition', {
+      agentId: state.currentAgent.id,
+      amount: intuitionEarned
+    });
+    state.currentAgent.intuition = (state.currentAgent.intuition || 0) + intuitionEarned;
+    sessionStorage.setItem('verbalia_agent', JSON.stringify(state.currentAgent));
+    if (intuitionEarned > 0) showNotification(`+${intuitionEarned} INTUITION`, 'success');
+  }
+}
+
+function retryModule() { startModule(state.currentModule); }
+function goToModules() {
+  showScreen('game');
+  renderGame();
+  showTab('modules');
+}
+function goToNextModule() {
+  const idx = LETTERS.indexOf(state.currentModule);
+  const next = LETTERS[idx + 1];
+  if (next) startModule(next);
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(`screen-${name}`)?.classList.add('active');
+}
+
+function showLoading(msg = 'CHARGEMENT...') {
+  const overlay = document.getElementById('loading-overlay');
+  overlay.querySelector('.loading-text').textContent = msg;
+  overlay.style.display = 'flex';
+}
+
+function showNotification(msg, type = '') {
+  const el = document.getElementById('notification');
+  el.textContent = msg;
+  el.className = 'notification ' + type + ' show';
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// Login on Enter
+document.getElementById('login-password')?.addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+document.getElementById('login-agent')?.addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('login-password').focus();
+});
+</script>
+</body>
+</html>
